@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F24E1E"/>
+      <stop offset="25%" stop-color="#FF7262"/>
+      <stop offset="50%" stop-color="#A259FF"/>
+      <stop offset="75%" stop-color="#1ABCFE"/>
+      <stop offset="100%" stop-color="#0ACF83"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1F2937" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#111827" stop-opacity="0.95"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#374151" stroke-width="0.6" stroke-opacity="0.35"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="380" rx="20" fill="url(#bg)"/>
+  <rect width="1200" height="380" rx="20" fill="url(#grid)"/>
+
+  <!-- Decorative Glow Circles -->
+  <circle cx="180" cy="90" r="140" fill="#A259FF" opacity="0.12"/>
+  <circle cx="980" cy="290" r="170" fill="#1ABCFE" opacity="0.12"/>
+  <circle cx="620" cy="60" r="110" fill="#0ACF83" opacity="0.08"/>
+
+  <!-- Left Section: Figma Logo + Brand Title -->
+  <g transform="translate(72, 68)">
+    <!-- Figma-inspired Geometric Emblem -->
+    <g transform="translate(0, 8)">
+      <rect x="0" y="0" width="84" height="84" rx="20" fill="#1F2937" stroke="#374151" stroke-width="1.5"/>
+      <!-- 5 Figma petals -->
+      <path d="M28 18 H42 V34 H28 A8 8 0 0 1 28 18 Z" fill="#F24E1E"/>
+      <path d="M42 18 H56 A8 8 0 0 1 56 34 H42 V18 Z" fill="#FF7262"/>
+      <path d="M28 34 H42 V50 H28 A8 8 0 0 1 28 34 Z" fill="#A259FF"/>
+      <circle cx="49" cy="42" r="8" fill="#1ABCFE"/>
+      <path d="M28 50 H42 V58 A8 8 0 0 1 26 58 A8 8 0 0 1 28 50 Z" fill="#0ACF83"/>
+    </g>
+
+    <!-- Title & Subtitle -->
+    <text x="106" y="46" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="800" fill="#F9FAFB" letter-spacing="-0.02em">
+      figma-cli <tspan fill="#1ABCFE" font-family="JetBrains Mono, monospace" font-size="36">(fm)</tspan>
+    </text>
+    <text x="106" y="80" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="500" fill="#9CA3AF">
+      Native Figma Design &amp; Asset Extraction CLI + Universal Skill for Any AI Agent
+    </text>
+
+    <!-- Gradient Divider Bar -->
+    <rect x="0" y="114" width="520" height="4" rx="2" fill="url(#accent)"/>
+
+    <!-- Feature Pills -->
+    <g transform="translate(0, 142)" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600">
+      <rect x="0" y="0" width="142" height="32" rx="8" fill="#1E293B" stroke="#334155"/>
+      <text x="71" y="21" fill="#38BDF8" text-anchor="middle">Golang Pure Binary</text>
+
+      <rect x="154" y="0" width="154" height="32" rx="8" fill="#1E293B" stroke="#334155"/>
+      <text x="231" y="21" fill="#A78BFA" text-anchor="middle">40-55% Less Tokens</text>
+
+      <rect x="320" y="0" width="136" height="32" rx="8" fill="#1E293B" stroke="#334155"/>
+      <text x="388" y="21" fill="#34D399" text-anchor="middle">Ubuntu / Cross-OS</text>
+
+      <rect x="468" y="0" width="164" height="32" rx="8" fill="#1E293B" stroke="#334155"/>
+      <text x="550" y="21" fill="#FB923C" text-anchor="middle">Universal Agent Skill</text>
+    </g>
+
+    <!-- Author / Owner Footer -->
+    <text x="0" y="216" font-family="Inter, -apple-system, sans-serif" font-size="14" font-weight="500" fill="#6B7280">
+      Crafted by <tspan fill="#E5E7EB" font-weight="700">DNT (github.com/ducconit)</tspan> • Antigravity • Claude Code • Codex • Cursor • Windsurf
+    </text>
+  </g>
+
+  <!-- Right Section: Terminal Preview Card -->
+  <g transform="translate(740, 56)">
+    <rect x="0" y="0" width="396" height="268" rx="14" fill="url(#cardGrad)" stroke="#374151" stroke-width="1.5"/>
+    <!-- Window Controls -->
+    <circle cx="22" cy="20" r="6" fill="#EF4444"/>
+    <circle cx="42" cy="20" r="6" fill="#F59E0B"/>
+    <circle cx="62" cy="20" r="6" fill="#10B981"/>
+    <text x="200" y="24" font-family="JetBrains Mono, monospace" font-size="12" fill="#6B7280" text-anchor="middle">ubuntu@workstation: ~/project</text>
+    <line x1="0" y1="38" x2="396" y2="38" stroke="#374151" stroke-width="1"/>
+
+    <!-- Terminal Lines -->
+    <g transform="translate(20, 66)" font-family="JetBrains Mono, monospace" font-size="12.5">
+      <text x="0" y="0" fill="#10B981">$ <tspan fill="#F9FAFB">fm install --agy --claude --codex</tspan></text>
+      <text x="0" y="22" fill="#9CA3AF">✓ Skill installed: ~/.agents/skills/figma-cli</text>
+      <text x="0" y="42" fill="#9CA3AF">✓ Symlinks ready : agy, claude, codex</text>
+
+      <text x="0" y="76" fill="#10B981">$ <tspan fill="#F9FAFB">fm fetch "https://figma.com/..."</tspan></text>
+      <text x="0" y="98" fill="#38BDF8">[FRAME] <tspan fill="#FDE047">"HeroCard"</tspan> <tspan fill="#A78BFA">#12:34</tspan> layout=row</text>
+      <text x="14" y="118" fill="#34D399">[IMAGE-SVG] <tspan fill="#FDE047">"ic-bolt"</tspan> <tspan fill="#A78BFA">#12:35</tspan></text>
+      <text x="14" y="138" fill="#F472B6">[TEXT] <tspan fill="#A78BFA">#12:36</tspan> text=<tspan fill="#86EFAC">"**Ship 10x Faster**"</tspan></text>
+
+      <text x="0" y="172" fill="#10B981">$ <tspan fill="#F9FAFB">fm download &lt;url&gt; --dir ./public</tspan></text>
+      <text x="0" y="192" fill="#9CA3AF">- hero-3a9f1c.png: 800x600 (cropped)</text>
+    </g>
+  </g>
+</svg>

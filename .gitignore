@@ -1,0 +1,22 @@
+# Compiled binaries & build outputs
+/fm
+/fm.exe
+/bin/
+/dist/
+skills/*/scripts/fm.exe
+!skills/figma-cli/scripts/fm
+.agents/skills/*/scripts/fm
+.agents/skills/*/scripts/fm.exe
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+skills/*/.env
+.agents/skills/*/.env
+
+# Local state & temporary files
+.agk/
+/tmp/
+*.log
+*.cpuprofile
