@@ -18,6 +18,7 @@ Tài liệu hướng dẫn toàn diện từ A-Z về cài đặt, cấu hình, 
    - [`fm set-token` — Lưu Access Token an toàn](#fm-set-token--lưu-access-token-an-toàn)
    - [`fm fetch` — Trích xuất & Tối ưu Cây Thiết kế](#fm-fetch--trích-xuất--tối-ưu-cây-thiết-kế)
    - [`fm download` — Tải & Cắt Tài nguyên Đa luồng](#fm-download--tải--cắt-tài-nguyên-đa-luồng)
+   - [`fm update` — Tự động Cập nhật Phiên bản Mới](#fm-update--tự-động-cập-nhật-phiên-bản-mới)
    - [`fm version` & `fm help`](#fm-version--fm-help)
 6. [💡 Best Practices & Kịch bản Tương tác cùng AI Agent](#6--best-practices--kịch-bản-tương-tác-cùng-ai-agent)
 
@@ -49,9 +50,36 @@ Tài liệu hướng dẫn toàn diện từ A-Z về cài đặt, cấu hình, 
 
 `figma-cli` là một file thực thi nhị phân tĩnh (**Single Static Binary, `CGO_ENABLED=0`**), không phụ thuộc vào Node.js, Python hay bất kỳ thư viện hệ thống ngoài nào.
 
-### Cách 1 (Khuyên dùng): Cài đặt qua `npx skills add -g`
+### Cách 1 (Khuyên dùng — 1 Command hoàn chỉnh): Cài đặt tự động theo Hệ điều hành
 
-Cách nhanh nhất và tiện lợi nhất cho mọi AI Agent. Tự động nạp skill `figma-cli` vào kho skill toàn cục:
+Script cài đặt sẽ tự động nhận diện kiến trúc CPU, tải đúng một binary duy nhất cho OS từ GitHub Releases mới nhất (không làm đầy thư mục bằng binary của OS khác) và tự động thiết lập symlink cho AI Agent theo biến môi trường `IDE`:
+
+#### Trên Linux (Ubuntu / Debian / Arch / Fedora / Alpine)
+```bash
+# Cài đặt cho Antigravity (hoặc claude, codex, all)
+IDE=antigravity curl -fsSL https://raw.githubusercontent.com/ducconit/figma-cli/main/scripts/install-linux.sh | bash
+```
+
+#### Trên macOS (Apple Silicon M1/M2/M3/M4)
+```bash
+IDE=antigravity curl -fsSL https://raw.githubusercontent.com/ducconit/figma-cli/main/scripts/install-darwin.sh | bash
+```
+
+#### Trên Windows (PowerShell)
+```powershell
+$env:IDE="antigravity"; irm https://raw.githubusercontent.com/ducconit/figma-cli/main/scripts/install-windows.ps1 | iex
+```
+
+> **Biến môi trường hỗ trợ**:
+> - `IDE`: Chọn AI Coding Agent để tạo symlink tự động (`antigravity`, `claude`, `codex`, `cursor`, `windsurf`, `copilot`, `opencode`, `cline`, hoặc `all`). Mặc định là `all`.
+> - `TOKEN` hoặc `FIGMA_API_KEY`: Truyền kèm token để script lưu luôn vào `~/.figma/.env` (ví dụ: `IDE=antigravity TOKEN=figd_xxx curl ... | bash`).
+> - `SKILL_PATH`: Tùy biến thư mục lưu skill (mặc định: `~/.agents/skills`).
+
+---
+
+### Cách 2: Cài đặt qua `npx skills add -g`
+
+Tự động nạp skill `figma-cli` vào kho skill toàn cục:
 
 ```bash
 # 1. Thêm skill figma-cli toàn cục (global)
@@ -63,7 +91,9 @@ npx skills add ducconit/figma-cli -g
 
 *(Nếu chỉ muốn thêm riêng vào thư mục dự án hiện tại, bỏ cờ `-g`: `npx skills add ducconit/figma-cli` $\rightarrow$ `./.agents/skills/figma-cli/scripts/fm set-token ...`)*
 
-### Cách 2: Tải Binary biên dịch sẵn từ GitHub Releases
+---
+
+### Cách 3: Tải Binary biên dịch sẵn từ GitHub Releases
 
 Tải bản phát hành chính thức mới nhất từ [GitHub Releases](https://github.com/ducconit/figma-cli/releases/latest):
 
@@ -91,7 +121,9 @@ chmod +x fm
    .\fm.exe set-token figd_YOUR_PERSONAL_ACCESS_TOKEN
    ```
 
-### Cách 3: Biên dịch từ mã nguồn (Build from Source)
+---
+
+### Cách 4: Biên dịch từ mã nguồn (Build from Source)
 
 Yêu cầu máy đã cài **Go 1.23+**:
 
@@ -139,6 +171,7 @@ flowchart TD
 | **`fm set-token`** | `fm set-token <token> [--oauth]` | Lưu hoặc cập nhật Access Token vào duy nhất file `~/.figma/.env`. |
 | **`fm fetch`** | `fm fetch <url-or-key> [flags]` | Tải và tinh gọn cây thiết kế thành Tree DSL (tiết kiệm 40%–55% token), YAML hoặc JSON. |
 | **`fm download`** | `fm download <url-or-key> [flags]` | Tải hình ảnh, GIF và SVG đa luồng. Mặc định lưu vào `/tmp`, hỗ trợ cắt ảnh affine crop. |
+| **`fm update`** | `fm update [flags]` | Tự động kiểm tra và nâng cấp binary lên phiên bản phát hành mới nhất từ GitHub Releases. |
 | **`fm version`** | `fm version [--json]` *(hoặc `fm -v`)* | Hiển thị phiên bản, commit hash, ngày build và thông tin Go runtime. |
 | **`fm help`** | `fm -h` / `fm <cmd> -h` | Hiển thị hướng dẫn chi tiết và ví dụ cho từng lệnh. |
 
@@ -260,6 +293,46 @@ fm download abc123XYZ --dir ./public/assets --manifest '[
     "requiresImageDimensions": true
   }
 ]'
+```
+
+---
+
+### `fm update` — Tự động Cập nhật Phiên bản Mới
+
+Kiểm tra và tự động cập nhật `fm` lên phiên bản mới nhất phát hành trên [GitHub Releases](https://github.com/ducconit/figma-cli/releases):
+
+```bash
+# 1. Tự động kiểm tra và tải bản cập nhật mới nhất (ghi đè binary an toàn)
+fm update
+
+# 2. Chỉ kiểm tra xem có bản mới hay không mà không tải
+fm update --check
+
+# 3. Ép buộc tải lại ngay cả khi đã ở phiên bản mới nhất
+fm update --force
+
+# 4. Cài đặt hoặc hạ cấp về một phiên bản/tag cụ thể
+fm update --version v0.0.2
+
+# 5. Xuất kết quả kiểm tra dưới dạng JSON (tiện cho script tự động hóa)
+fm update --check --json
+```
+
+---
+
+### `fm version` & `fm help`
+
+```bash
+# Xem phiên bản, OS/Arch và commit hash
+fm version
+
+# Xem phiên bản định dạng JSON
+fm version --json
+
+# Xem trợ giúp chung hoặc trợ giúp cho từng lệnh
+fm -h
+fm fetch -h
+fm update -h
 ```
 
 ---

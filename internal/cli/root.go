@@ -111,6 +111,7 @@ Authentication is resolved in order:
 		newDownloadCmd(&flags),
 		newInstallCmd(&flags),
 		newSetTokenCmd(),
+		newUpdateCmd(&flags),
 		newVersionCmd(),
 	)
 

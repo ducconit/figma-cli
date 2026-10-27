@@ -160,13 +160,23 @@ flowchart TD
 
 ## ⚡ Khởi động Nhanh (Quick Start)
 
-Chỉ với **3 bước đơn giản** trong chưa đầy 1 phút để trang bị năng lực Figma cho mọi AI Coding Agent:
+Trang bị năng lực Figma hoàn chỉnh cho AI Coding Agent với **1 lệnh duy nhất** theo hệ điều hành (tự động nhận diện kiến trúc CPU, tải đúng 1 binary duy nhất từ GitHub Releases và cấu hình symlink cho IDE):
 
-### 1. Cài đặt Agent Skill toàn cục
-Cài đặt skill `figma-cli` trực tiếp vào `~/.agents/skills/figma-cli` (đã tích hợp sẵn binary thực thi đa nền tảng Linux, macOS, Windows):
+### 1. Cài đặt 1 Command theo Hệ điều hành
+
 ```bash
-npx skills add ducconit/figma-cli -g
+# Trên Linux (Ubuntu / Debian / Arch / Fedora):
+IDE=antigravity curl -fsSL https://raw.githubusercontent.com/ducconit/figma-cli/main/scripts/install-linux.sh | bash
+
+# Trên macOS (Apple Silicon / Darwin):
+IDE=antigravity curl -fsSL https://raw.githubusercontent.com/ducconit/figma-cli/main/scripts/install-darwin.sh | bash
+
+# Trên Windows (PowerShell):
+$env:IDE="antigravity"; irm https://raw.githubusercontent.com/ducconit/figma-cli/main/scripts/install-windows.ps1 | iex
 ```
+
+> **Chọn IDE mong muốn**: Thay `IDE=antigravity` bằng `IDE=claude`, `IDE=codex`, `IDE=cursor`, `IDE=windsurf`, `IDE=copilot`, `IDE=opencode`, `IDE=cline`, hoặc `IDE=all` (tạo symlink cho tất cả).
+> *(Ngoài ra, bạn cũng có thể cài đặt toàn cục bằng `npx skills add ducconit/figma-cli -g`)*.
 
 ### 2. Cấu hình Figma Access Token
 Lấy Personal Access Token từ Figma (**Settings** $\rightarrow$ **Security** $\rightarrow$ **Generate new token** với quyền `File content: Read`), sau đó lưu an toàn vào `~/.figma/.env`:
@@ -196,6 +206,7 @@ Mở bất kỳ AI Agent nào (Google Antigravity, Claude Code, OpenAI Codex, Cu
 | :--- | :--- | :--- |
 | **`fm fetch`** | `fm fetch <url-figma> -o /tmp/screen.tree` | Trích xuất cây layout, styles, typography sang Tree DSL (tiết kiệm 40%–55% token). |
 | **`fm download`** | `fm download <url-figma> --dir ./public/images` | Tải toàn bộ hình ảnh, GIF và icon vector SVG tự động (mặc định lưu `/tmp`). |
+| **`fm update`** | `fm update` *(hoặc `fm update --check`)* | Tự động kiểm tra và nâng cấp lên phiên bản mới nhất từ GitHub Releases. |
 | **`fm set-token`** | `fm set-token figd_xxx` | Lưu Personal Access Token vào file bảo mật `~/.figma/.env`. |
 | **`fm install`** | `fm install --all` (hoặc `--agy --claude --codex`) | Cài đặt skill và tạo symlink tự động sang thư mục của các AI Coding Agent. |
 | **`fm version`** | `fm version` *(hoặc `fm -v`)* | Kiểm tra phiên bản binary, commit build và môi trường OS/Arch. |

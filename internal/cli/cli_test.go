@@ -44,7 +44,7 @@ func TestVersionAndHelpCommands(t *testing.T) {
 	}
 
 	// 3. fm -h and subcommands -h
-	for _, sub := range [][]string{{"-h"}, {"fetch", "-h"}, {"download", "-h"}, {"install", "-h"}, {"set-token", "-h"}} {
+	for _, sub := range [][]string{{"-h"}, {"fetch", "-h"}, {"download", "-h"}, {"install", "-h"}, {"set-token", "-h"}, {"update", "-h"}} {
 		helpOut, err := executeCLI(t, sub...)
 		if err != nil {
 			t.Fatalf("fm %v failed: %v", sub, err)
@@ -214,5 +214,43 @@ func TestFetchDownloadAndInstallCLIIntegration(t *testing.T) {
 	}
 	if !strings.Contains(string(homeEnvBytes), "FIGMA_API_KEY=figd_set_token_987654") {
 		t.Fatalf("expected updated FIGMA_API_KEY in ~/.figma/.env, got:\n%s", string(homeEnvBytes))
+	}
+}
+
+func TestUpdateCLICommand(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/releases/latest") {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{
+				"tag_name": "v9.9.9",
+				"name": "v9.9.9 Release",
+				"assets": [
+					{"name": "fm-linux-amd64", "browser_download_url": "https://example.com/fm-linux-amd64", "size": 1024},
+					{"name": "fm-darwin-arm64", "browser_download_url": "https://example.com/fm-darwin-arm64", "size": 1024},
+					{"name": "fm-windows-amd64.exe", "browser_download_url": "https://example.com/fm-windows-amd64.exe", "size": 1024}
+				]
+			}`))
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer mockServer.Close()
+
+	// 1. Check update
+	out, err := executeCLI(t, "update", "--check", "--test-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm update --check failed: %v", err)
+	}
+	if !strings.Contains(out, "v9.9.9") {
+		t.Fatalf("expected v9.9.9 in update output, got:\n%s", out)
+	}
+
+	// 2. Check update with --json
+	outJSON, err := executeCLI(t, "update", "--check", "--json", "--test-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm update --check --json failed: %v", err)
+	}
+	if !strings.Contains(outJSON, `"hasUpdate": true`) || !strings.Contains(outJSON, `"latestVersion": "9.9.9"`) {
+		t.Fatalf("unexpected json output:\n%s", outJSON)
 	}
 }
