@@ -10,32 +10,32 @@
     <a href="https://ubuntu.com/"><img src="https://img.shields.io/badge/Platform-Ubuntu%20%7C%20Linux%20%7C%20macOS%20%7C%20Windows-E95420?style=flat-square&logo=ubuntu&logoColor=white" alt="Platform Support" /></a>
     <a href="https://github.com/ducconit/figma-cli/actions/workflows/release.yml"><img src="https://github.com/ducconit/figma-cli/actions/workflows/release.yml/badge.svg" alt="Release Multi-OS Binaries" /></a>
     <a href="https://github.com/ducconit/figma-cli/issues"><img src="https://img.shields.io/badge/Issues-Welcome-0ACF83?style=flat-square&logo=github" alt="Issues" /></a>
-    <a href="#-tuyên-bố-vibe-coding-ai-assisted-vibe-coding-disclaimer"><img src="https://img.shields.io/badge/Vibe%20Coding-100%25%20AI%20Assisted-FF7262?style=flat-square&logo=visualstudiocode" alt="Vibe Coding" /></a>
-    <a href="#-donate--ủng-hộ-tác-giả"><img src="https://img.shields.io/badge/Donate-MBBank%200387521623-FF5E5B?style=flat-square" alt="Donate MBBank" /></a>
+    <a href="https://github.com/ducconit/figma-cli/stargazers"><img src="https://img.shields.io/github/stars/ducconit/figma-cli?style=flat-square&logo=github&color=gold" alt="GitHub Stars" /></a>
+    <a href="#-tuyên-bố-vibe-coding-vibecoded-with-google-antigravity"><img src="https://img.shields.io/badge/Vibe%20Coded%20with-Google%20Antigravity-4285F4?style=flat-square&logo=google" alt="Vibe Coded with Google Antigravity" /></a>
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-A259FF?style=flat-square" alt="Apache License 2.0" /></a>
   </p>
 
   <p>
-    <a href="#-tuyên-bố-vibe-coding-ai-assisted-vibe-coding-disclaimer">Vibe Coding</a> •
+    <a href="#-tuyên-bố-vibe-coding-vibecoded-with-google-antigravity">Vibe Coding</a> •
     <a href="#-tại-sao-ra-đời-figma-cli-fm">Lý do ra đời</a> •
     <a href="#-bảng-so-sánh-thực-nghiệm-kỹ-thuật-empirical-benchmarks">So sánh Thực nghiệm</a> •
     <a href="#-vòng-đời-hoạt-động-lifecycle-chart">Lifecycle Chart</a> •
-    <a href="#-cài-đặt--khởi-tạo-nhanh">Cài đặt</a> •
-    <a href="#-danh-sách-command-hỗ-trợ">Danh sách Command</a> •
-    <a href="#-hướng-dẫn-sử-dụng-chi-tiết">Hướng dẫn sử dụng</a> •
+    <a href="#-khởi-động-nhanh-quick-start">Quick Start</a> •
+    <a href="#-bảng-tra-cứu-lệnh-nhanh-cheat-sheet">Cheat Sheet</a> •
+    <a href="./GUIDE.md">Tài liệu Chi tiết (GUIDE.md)</a> •
     <a href="#-tài-liệu-kiến-trúc-docs">Kiến trúc chuyên sâu</a> •
     <a href="#-đóng-góp--báo-lỗi-contribute--issues">Contribute & Issues</a> •
-    <a href="#-donate--ủng-hộ-tác-giả">Donate</a>
+    <a href="#-star-history">Star History</a>
   </p>
 </div>
 
 ---
 
 > [!WARNING]
-> ### ⚠️ Tuyên bố Vibe Coding (AI-Assisted Vibe Coding Disclaimer)
-> Repository này được hiện thực hóa theo phong cách **Vibe Coding** — đồng hành 100% cùng các AI Coding Agent (**Google Antigravity**, **Claude Code**, **OpenAI Codex**), dựa trên việc nghiên cứu giải phẫu mã nguồn TypeScript của **Figma-Context-MCP (GLips)** và tái kiến trúc sang **Golang thuần (`CGO_ENABLED=0`)**.
+> ### ⚠️ Tuyên bố Vibe Coding (Vibe Coded with Google Antigravity)
+> Repository này được hiện thực hóa theo phong cách **Vibe Coding** — tác giả sử dụng **Google Antigravity** làm trợ lý đồng hành xuyên suốt 100% quá trình phát triển: từ khâu nghiên cứu giải phẫu mã nguồn TypeScript của **Figma-Context-MCP (GLips)**, chuyển đổi thuật toán hình học sang **Golang thuần (`CGO_ENABLED=0`)**, thiết kế concurrency pipeline đa luồng (`goroutine` + `channel`), viết trọn bộ test suite cho đến tinh chỉnh tối ưu hóa token.
 >
-> Toàn bộ mã nguồn đã pass 100% bộ test tự động (`go test -race -count=1 ./...`, `go vet ./...`) và được kiểm chứng qua các kịch bản thực nghiệm. Tuy nhiên, vì đây là sản phẩm Vibe Coding được sinh ra từ sự cộng tác chặt chẽ với AI, người dùng nên kiểm tra, đo đạc và chạy thử nghiệm kỹ lưỡng trước khi đưa vào các môi trường production đặc thù. Mọi ý kiến phản biện, đóng góp và mã PR hoàn thiện từ cộng đồng luôn được hoan nghênh!
+> Toàn bộ mã nguồn đã pass 100% bộ test tự động (`go test -race -count=1 ./...`, `go vet ./...`) và được kiểm chứng qua các kịch bản đo đạc thực tế. Tuy nhiên, vì toàn bộ dự án được tạo nên bằng phương thức **Vibe Coding cùng AI**, người dùng nên kiểm tra, đo đạc và chạy thử nghiệm kỹ lưỡng trước khi đưa vào các môi trường production đặc thù. Mọi ý kiến phản biện, đóng góp và mã PR hoàn thiện từ cộng đồng luôn được hoan nghênh!
 
 ---
 
@@ -158,261 +158,49 @@ flowchart TD
 
 ---
 
-## 🚀 Cài đặt & Khởi tạo Nhanh
+## ⚡ Khởi động Nhanh (Quick Start)
 
-### Yêu cầu hệ thống
-- **Hệ điều hành**: Ubuntu / Debian / Arch / Fedora (Linux), macOS (`amd64`/`arm64`), hoặc Windows (`amd64`).
-- **Go toolchain** *(nếu cài hoặc build từ mã nguồn)*: Go `1.23+` (đã kiểm chứng trên `go1.27.3 linux/amd64`).
-- **Figma Personal Access Token**: Xem hướng dẫn lấy token ngay bên dưới.
+Chỉ với **3 bước đơn giản** trong chưa đầy 1 phút để trang bị năng lực Figma cho mọi AI Coding Agent:
 
-### 🔑 Hướng dẫn lấy Figma Personal Access Token (PAT)
-
-Để `fm` có thể đọc cấu trúc thiết kế và tải ảnh/SVG từ Figma, bạn cần tạo một **Personal Access Token** theo các bước sau:
-
-1. Đăng nhập vào tài khoản Figma tại [https://www.figma.com](https://www.figma.com).
-2. Nhấn vào **Avatar / Tên tài khoản** ở góc trên bên trái màn hình $\rightarrow$ chọn **Settings** (Cài đặt).
-3. Chuyển sang tab **Security** (Bảo mật) $\rightarrow$ cuộn xuống phần **Personal access tokens**.
-4. Nhấn nút **Generate new token**:
-   - **Token name**: Đặt tên gợi nhớ (ví dụ: `figma-cli`).
-   - **Expiration**: Chọn thời hạn sử dụng mong muốn.
-   - **Scopes (Quyền truy cập)**:
-     - **`File content`**: Chọn **`Read`** *(Bắt buộc — dùng để đọc cây thiết kế và xuất ảnh/SVG)*.
-     - **`Dev resources`**: Chọn **`Read`** *(Khuyên dùng)*.
-5. Nhấn **Generate token** và **sao chép ngay mã token** (có định dạng bắt đầu bằng `figd_...`, vì Figma chỉ hiển thị mã này một lần duy nhất).
-6. Lưu token vào máy bằng lệnh **`fm set-token <token>`** hoặc thêm vào file `.env` (chi tiết ở mục Hướng dẫn sử dụng bên dưới).
-
----
-
-### ⭐ Cách 1 (Khuyên dùng — Recommended): Cài đặt bằng `npx skills add ducconit/figma-cli -g`
-
-Đây là cách nhanh nhất để cài đặt skill **`figma-cli`** toàn cục (`-g` / global) vào `~/.agents/skills/figma-cli` (đã tích hợp sẵn binary `fm` tại `scripts/fm`) cho các AI Coding Agent (Antigravity, Claude Code, Codex, Cursor, Windsurf, Copilot, OpenCode, Cline,...):
-
+### 1. Cài đặt Agent Skill toàn cục
+Cài đặt skill `figma-cli` trực tiếp vào `~/.agents/skills/figma-cli` (đã tích hợp sẵn binary thực thi đa nền tảng Linux, macOS, Windows):
 ```bash
-# 1. Cài đặt Agent Skill `figma-cli` toàn cục từ GitHub
 npx skills add ducconit/figma-cli -g
+```
 
-# 2. Lưu Figma Personal Access Token vào ~/.figma/.env
+### 2. Cấu hình Figma Access Token
+Lấy Personal Access Token từ Figma (**Settings** $\rightarrow$ **Security** $\rightarrow$ **Generate new token** với quyền `File content: Read`), sau đó lưu an toàn vào `~/.figma/.env`:
+```bash
 ~/.agents/skills/figma-cli/scripts/fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN
 ```
 
-*(Nếu cài đặt riêng vào project hiện tại không có `-g`: chạy `npx skills add ducconit/figma-cli` $\rightarrow$ `./.agents/skills/figma-cli/scripts/fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN`)*
-
-### Cách 2: Tải Binary từ GitHub Releases (`latest`) $\rightarrow$ Chạy `install` & `set-token`
-
-Bạn có thể tải trực tiếp bản biên dịch mới nhất (`latest`) cho **Linux**, **macOS**, hoặc **Windows** từ trang [GitHub Releases](https://github.com/ducconit/figma-cli/releases/latest), sau đó chạy `install` và `set-token`:
-
-```bash
-# 1. Tải binary mới nhất từ GitHub Releases (ví dụ bản Linux amd64; với macOS đổi thành fm-macos-arm64 / fm-macos-amd64)
-curl -fsSL https://github.com/ducconit/figma-cli/releases/latest/download/fm-linux-amd64 -o fm
-chmod +x fm
-
-# 2. Cài đặt Agent Skill (mặc định vào ~/.agents/skills/figma-cli) và tạo symlink cho các AI Agent
-./fm install --agy --claude --codex
-# (Hoặc chạy `./fm install --all` để tạo symlink cho toàn bộ các AI Agent)
-
-# 3. Lưu Figma Personal Access Token vào ~/.figma/.env
-./fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN
-```
-
-### Cách 3: `git clone` $\rightarrow$ Build từ Source $\rightarrow$ Chạy `install` & `set-token`
-
-```bash
-# 1. Clone repository & biên dịch ra binary `./fm`
-git clone https://github.com/ducconit/figma-cli.git
-cd figma-cli
-make build
-
-# 2. Cài đặt Agent Skill và tạo symlink cho các AI Agent mong muốn
-./fm install --agy --claude --codex
-
-# 3. Lưu Figma Personal Access Token vào ~/.figma/.env
-./fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN
-```
-
-> **Cross-Compilation**: Mỗi khi phát hành phiên bản mới (`v*`, ví dụ `v0.0.1`), workflow [`.github/workflows/release.yml`](./.github/workflows/release.yml) tự động biên dịch 3 hệ điều hành (**Linux**, **macOS**, **Windows**) và đính kèm vào **GitHub Release Assets** kèm `checksums.txt`. Bạn cũng có thể tự biên dịch toàn bộ trên máy local bằng lệnh `make cross-build` (xuất ra thư mục `dist/`).
+### 3. Tận hưởng cùng AI Agent
+Mở bất kỳ AI Agent nào (Google Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf,...) và gửi link Figma:
+> *"Hãy đọc thiết kế tại `https://www.figma.com/design/<key>/<name>?node-id=12-34` và sinh component frontend hoàn chỉnh, tải ảnh về `./public/images`."*
 
 ---
 
-## 📋 Danh sách Command Hỗ trợ
+> [!TIP]
+> ### 📖 Bạn cần hướng dẫn cài đặt nâng cao hoặc tùy biến chuyên sâu?
+> Xem toàn bộ tài liệu hướng dẫn chi tiết từ A-Z tại [**`GUIDE.md`**](./GUIDE.md):
+> - **[Cài đặt đa phương thức](./GUIDE.md#2--phương-thức-cài-đặt-chi-tiết)**: Tải binary GitHub Releases, build từ source `make build`, cross-compilation.
+> - **[Quản lý Token 4 tầng](./GUIDE.md#3-️-quản-lý-token--thứ-tự-ưu-tiên-cấu-hình)**: CLI flag, project `.env`, `~/.figma/.env` và OS environment.
+> - **[Cài đặt Symlink cho 8+ AI Agent](./GUIDE.md#fm-install--cài-đặt-universal-agent-skill)**: Antigravity, Claude Code, Codex, Cursor, Windsurf, Copilot, OpenCode, Cline.
+> - **[Trích xuất nâng cao & Cắt ảnh](./GUIDE.md#5-️-hướng-dẫn-chi-tiết-từng-lệnh)**: Tham số `--depth`, xuất JSON/YAML, cắt ảnh theo ma trận 2x3 affine crop và manifest.
 
-| Command | Cú pháp | Mô tả Chức năng |
+---
+
+## 📋 Bảng Tra cứu Lệnh Nhanh (Cheat Sheet)
+
+| Command | Ví dụ Cú pháp Thông dụng | Mô tả Ngắn gọn |
 | :--- | :--- | :--- |
-| **`fm fetch`** | `fm fetch [url-or-fileKey] [flags]` | Tải dữ liệu thiết kế của toàn bộ file Figma hoặc một node cụ thể (`node-id`), rút gọn layout/style/text/components, gộp nhóm vector thành `IMAGE-SVG` và xuất ra định dạng `tree` (mặc định), `yaml`, hoặc `json`. |
-| **`fm download`** | `fm download [url-or-fileKey] [flags]` | Tải tài nguyên hình ảnh (`imageRef`), ảnh động GIF (`gifRef`), và icon/node kết xuất (`PNG`/`SVG`). **Mặc định tải về thư mục tạm của hệ điều hành (`/tmp` trên Ubuntu)**; dùng `--dir` để chỉ định thư mục khác. Tự động cắt ảnh (crop) và trích xuất kích thước. |
-| **`fm set-token`** | `fm set-token <token> [--oauth]` | Lưu hoặc cập nhật Figma Access Token (`FIGMA_API_KEY`, hoặc `FIGMA_OAUTH_TOKEN` khi thêm `--oauth`) **duy nhất vào file `~/.figma/.env`** với quyền bảo mật `0600`. |
-| **`fm install`** | `fm install [flags]` | Cài đặt **Universal Figma Agent Skill** (`figma-cli`) vào kho skill chuẩn (mặc định: `~/.agents/skills/figma-cli`, hoặc dùng `--path` để chỉ định như `--path .agent/skills` cho từng project). Hỗ trợ các cờ tạo nhanh **symlink** sang thư mục của từng AI Agent (`--antigravity`\|`--agy`, `--claude`, `--codex`, `--cursor`, `--windsurf`, `--copilot`, `--opencode`, `--cline`, `--all`). |
-| **`fm version`** | `fm version [--json]` *(hoặc `fm -v`)* | Hiển thị thông tin chi tiết về phiên bản `fm`, hệ điều hành/kiến trúc (`OS/Arch`), phiên bản Go runtime và mã commit build. |
-| **`fm help`** | `fm -h` / `fm <command> -h` | Hiển thị tài liệu trợ giúp chi tiết, danh sách cờ (flags) và ví dụ minh họa cho từng lệnh. |
+| **`fm fetch`** | `fm fetch <url-figma> -o /tmp/screen.tree` | Trích xuất cây layout, styles, typography sang Tree DSL (tiết kiệm 40%–55% token). |
+| **`fm download`** | `fm download <url-figma> --dir ./public/images` | Tải toàn bộ hình ảnh, GIF và icon vector SVG tự động (mặc định lưu `/tmp`). |
+| **`fm set-token`** | `fm set-token figd_xxx` | Lưu Personal Access Token vào file bảo mật `~/.figma/.env`. |
+| **`fm install`** | `fm install --all` (hoặc `--agy --claude --codex`) | Cài đặt skill và tạo symlink tự động sang thư mục của các AI Coding Agent. |
+| **`fm version`** | `fm version` *(hoặc `fm -v`)* | Kiểm tra phiên bản binary, commit build và môi trường OS/Arch. |
 
-### Các Cờ Toàn cục (Global Flags — Áp dụng cho mọi lệnh)
-
-| Flag | Biến Môi trường Tương ứng | Mô tả |
-| :--- | :--- | :--- |
-| `--token <string>` | `FIGMA_API_KEY` *(hoặc `FIGMA_TOKEN`)* | Figma Personal Access Token (gửi qua header `X-Figma-Token`). |
-| `--oauth-token <string>` | `FIGMA_OAUTH_TOKEN` | Figma OAuth2 Bearer Token (gửi qua header `Authorization: Bearer`). Được ưu tiên hơn `--token` nếu cả hai cùng có mặt. |
-| `--env <path>` | *(Thứ tự ưu tiên: `./.env` $\rightarrow$ `~/.figma/.env` $\rightarrow$ OS Env)* | Đường dẫn tới file `.env` chứa biến môi trường. |
-| `--proxy <url\|none>` | `FIGMA_PROXY`, `HTTPS_PROXY`, `HTTP_PROXY`, `NO_PROXY` | Chỉ định URL proxy doanh nghiệp tường minh, hoặc truyền `--proxy=none` để bỏ qua proxy hệ thống. |
-| `-v, --version` | — | Xem nhanh phiên bản `fm`. |
-| `-h, --help` | — | Xem hướng dẫn sử dụng của lệnh. |
-
----
-
-## 📖 Hướng dẫn Sử dụng Chi tiết
-
-### 1. Cài đặt Universal Agent Skill (Khuyên dùng `npx skills` hoặc `fm install`)
-
-#### Cách A (Khuyên dùng): Dùng `npx skills add -g`
-```bash
-npx skills add ducconit/figma-cli -g
-~/.agents/skills/figma-cli/scripts/fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN
-```
-
-#### Cách B: Dùng trực tiếp `fm install`
-Mặc định, `fm install` sẽ cài đặt skill vào thư mục gốc **`~/.agents/skills/figma-cli`** (`--path ~/.agents/skills`). Bạn có thể dùng `--path` để chỉ định thư mục khác (ví dụ `--path .agent/skills` khi cài riêng vào project), và dùng các flag nhanh (`--antigravity` / `--agy`, `--claude`, `--codex`, `--cursor`,...) để tự động tạo **symlink** vào đúng thư mục skill của từng AI Agent:
-
-| Flag Nhanh | AI Agent Mục tiêu | Đường dẫn Symlink được tạo |
-| :--- | :--- | :--- |
-| `--antigravity`, `--agy` | **Google Antigravity** | `~/.gemini/config/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--claude` | **Claude Code** | `~/.claude/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--codex` | **OpenAI Codex CLI** | `~/.codex/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--cursor` | **Cursor** | `~/.cursor/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--windsurf` | **Windsurf** | `~/.codeium/windsurf/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--copilot` | **GitHub Copilot** | `~/.copilot/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--opencode` | **OpenCode** | `~/.config/opencode/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--cline` | **Cline** | `~/.cline/skills/figma-cli` $\rightarrow$ `<path>/figma-cli` |
-| `--all`, `-a` | **Tất cả AI Agents trên** | Tạo symlink đồng loạt cho toàn bộ các Agent được hỗ trợ |
-
-```bash
-# 1. Cài đặt mặc định vào ~/.agents/skills/figma-cli và tạo symlink cho Antigravity, Claude Code, Codex
-./fm install --agy --claude --codex
-
-# 2. Cài đặt và tạo symlink cho TẤT CẢ các AI Agent trên máy chỉ với 1 lệnh
-./fm install --all
-
-# 3. Cài đặt trực tiếp vào một project cụ thể qua --path .agent/skills (hoặc .agents/skills)
-./fm install --path .agent/skills
-
-# 4. Chỉ định đường dẫn thư mục tùy ý qua --path
-./fm install --path /custom/path/skills --agy
-```
-
-Sau khi chạy, cấu trúc thư mục Skill chuẩn được tạo ra gồm:
-```text
-~/.agents/skills/figma-cli/      # (hoặc .agent/skills/figma-cli khi dùng --path .agent/skills)
-├── SKILL.md                     # Hướng dẫn quy trình 3 bước chuẩn cho mọi AI Agent
-├── references/
-│   └── tree-dsl.md              # Tài liệu giải mã cú pháp Tree DSL
-└── scripts/
-    └── fm                       # Binary thực thi độc lập theo đúng OS hiện tại
-```
-
----
-
-### 2. Lưu & Cấu hình Figma Access Token (`fm set-token` hoặc `.env`)
-
-Bạn có thể cấu hình Access Token bằng lệnh **`fm set-token <token>`** hoặc tự thêm vào file `.env` theo thứ tự ưu tiên:
-
-#### Cách 1: Dùng lệnh `fm set-token <token>` (Cập nhật trực tiếp vào `~/.figma/.env`)
-Lệnh `fm set-token` chỉ thực hiện ghi/cập nhật biến `FIGMA_API_KEY` (hoặc `FIGMA_OAUTH_TOKEN` khi có `--oauth`) vào duy nhất file **`~/.figma/.env`** với quyền bảo mật `0600`:
-
-```bash
-# Lưu Figma Personal Access Token vào ~/.figma/.env
-./fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN
-
-# Hoặc lưu OAuth2 Bearer Token vào ~/.figma/.env
-./fm set-token --oauth YOUR_OAUTH_BEARER_TOKEN
-```
-
-#### Cách 2: Cấu hình biến môi trường vào file `.env` theo thứ tự ưu tiên
-Khi AI Agent chạy `fm` trên máy đã cài (ví dụ skill được cài ở `./.agents/skills/figma-cli` trong project mà Antigravity đang mở), `fm` sẽ tự động tìm đọc token theo **thứ tự ưu tiên từ cao xuống thấp**:
-1. **CLI Flags**: `--token <PAT>` hoặc `--oauth-token <OAUTH>` truyền trực tiếp trên lệnh.
-2. **File `.env` tại thư mục Project đang mở (`<project>/.env`)**: Nếu dự án mà AI Agent đang mở có file `.env` khai báo `FIGMA_API_KEY=figd_xxx`, `fm` sẽ ưu tiên dùng token của dự án đó trước tiên.
-3. **File `~/.figma/.env` trên máy người dùng**: Nếu project đang mở không có `.env`, `fm` sẽ đọc từ `~/.figma/.env` (nơi lệnh `fm set-token` lưu).
-4. **Environment của thiết bị (OS Environment)**: Cuối cùng mới đọc biến môi trường của hệ điều hành (`export FIGMA_API_KEY=figd_xxx`).
-
----
-
-### 3. Lấy dữ liệu thiết kế (`fm fetch`)
-
-```bash
-# 1. Lấy dữ liệu trực tiếp từ URL Figma (tự động tách fileKey và chuẩn hóa node-id=12-34 -> 12:34)
-./fm fetch "https://www.figma.com/design/abc123XYZ/E-Commerce-UI?node-id=12-34"
-
-# 2. Chỉ định rõ --file-key (-k), --node-id (-n) và giới hạn độ sâu --depth (-d)
-./fm fetch -k abc123XYZ -n 12:34 -d 3
-
-# 3. Đổi định dạng đầu ra sang YAML hoặc JSON (mặc định là tree)
-./fm fetch "https://www.figma.com/design/abc123XYZ/E-Commerce-UI?node-id=12-34" --format yaml
-./fm fetch "https://www.figma.com/design/abc123XYZ/E-Commerce-UI?node-id=12-34" --json
-
-# 4. Ghi kết quả thẳng ra file (-o / --output) đối với các màn hình thiết kế lớn
-./fm fetch "https://www.figma.com/design/abc123XYZ/E-Commerce-UI?node-id=12-34" -o /tmp/screen.tree
-```
-
-**Ví dụ đầu ra định dạng `tree` (tiết kiệm 40%–55% token so với JSON — [xem chứng minh](#-bảng-so-sánh-thực-nghiệm-kỹ-thuật-empirical-benchmarks)):**
-```text
-NAME: "E-Commerce Checkout"
-
-GLOBAL_VARS:
-Brand / Primary:
-  - '#2563EB'
-ts1:
-  fills:
-    - '#DC2626'
-
-ELEMENTS:
-EL-9a8b7c6d:
-  type: RECTANGLE
-  borderRadius: 8px
-  fills:
-    - '#F3F4F6'
-
-NODES:
-[FRAME] "CheckoutCard" #12:34 layout={"mode":"column","padding":"24px","gap":"16px","sizing":{"horizontal":"contextual","vertical":"hug"},"designedWidth":"480px"} fills="Brand / Primary" borderRadius=16px
-  [IMAGE-SVG] "ic-shield-check" #12:35 layout={"mode":"none","dimensions":{"width":24,"height":24}}
-  [RECTANGLE] "Item A" #12:36 template=EL-9a8b7c6d
-  [RECTANGLE] "Item B" #12:37 template=EL-9a8b7c6d
-  [TEXT] #12:38 textStyle={"fontFamily":"Inter","fontWeight":500,"fontSize":16} boldWeight=700 text="Discount: {ts1}**-50%**{/ts1}"
-```
-
----
-
-### 4. Tải tài nguyên hình ảnh & SVG (`fm download`)
-
-Mặc định, `fm download` sẽ tải tài nguyên về **thư mục tạm của hệ điều hành** (`os.TempDir()`, tức `/tmp` trên Ubuntu/Linux). Bạn có thể thêm cờ `--dir` để chỉ định bất kỳ đường dẫn thư mục nào mong muốn:
-
-```bash
-# 1. Tự động quét và tải TẤT CẢ ảnh + icon [IMAGE-SVG] trong node về thư mục /tmp mặc định của OS
-./fm download "https://www.figma.com/design/abc123XYZ/E-Commerce-UI?node-id=12-34"
-
-# 2. Tải về thư mục chỉ định qua --dir (ví dụ ./public/images)
-./fm download "https://www.figma.com/design/abc123XYZ/E-Commerce-UI?node-id=12-34" --dir ./public/images
-
-# 3. Tải các tài nguyên cụ thể bằng cờ --item (-i)
-./fm download abc123XYZ --dir ./public/images \
-  --item "nodeId=12:35,file=ic-shield-check.svg" \
-  --item "nodeId=12:40,imageRef=8f9a1b2c3d4e,file=banner.png"
-
-# 4. Tải kèm ma trận cắt ảnh (cropTransform) và yêu cầu biến CSS cho ảnh lặp TILE qua --manifest (-m)
-./fm download abc123XYZ --dir ./public/images --manifest '[
-  {
-    "nodeId": "12:40",
-    "imageRef": "8f9a1b2c3d4e",
-    "fileName": "banner.png",
-    "filenameSuffix": "3a9f1c",
-    "needsCropping": true,
-    "cropTransform": [[0.5, 0, 0.25], [0, 0.5, 0.1]],
-    "requiresImageDimensions": true
-  }
-]'
-```
-
-**Ví dụ đầu ra của `fm download`:**
-```text
-Downloaded 2 images to `/home/ubuntu/workspace/my-app/public/images`:
-- ic-shield-check.svg: 24x24
-- banner-3a9f1c.png: 600x400 | --original-width: 600px; --original-height: 400px; (cropped)
-```
+*(Xem danh sách chi tiết các cờ toàn cục `--proxy`, `--oauth-token`, `--env` tại [GUIDE.md](./GUIDE.md#4--danh-mục-command--flags-toàn-cục))*.
 
 ---
 
@@ -461,15 +249,18 @@ Nếu bạn gặp bất kỳ sự cố nào khi chạy `fm` trên Ubuntu/Linux, 
 
 ---
 
-## ☕ Donate / Ủng hộ Tác giả
+## 🌟 Star History
 
-Nếu `figma-cli` (`fm`) giúp công việc của bạn và AI Agent nhanh hơn, hiệu quả hơn, bạn có thể mời tác giả một ly cà phê tại:
-
-- **Ngân hàng**: **MBBank** (Ngân hàng TMCP Quân Đội)
-- **Số tài khoản**: **`0387521623`**
+Nếu bạn thấy `figma-cli` hữu ích cho quy trình làm việc cùng các AI Coding Agent, hãy để lại một ⭐ **Star** trên GitHub để ủng hộ dự án nhé!
 
 <div align="center">
-  <img src="https://img.vietqr.io/image/MB-0387521623-compact2.png?addInfo=Donate%20figma-cli" alt="VietQR MBBank 0387521623" width="260" />
+  <a href="https://star-history.com/#ducconit/figma-cli&Date">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ducconit/figma-cli&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ducconit/figma-cli&type=Date" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ducconit/figma-cli&type=Date" width="100%" />
+    </picture>
+  </a>
 </div>
 
 ---
