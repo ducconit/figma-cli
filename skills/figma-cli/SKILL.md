@@ -20,15 +20,42 @@ When `fm` runs on the installed machine, it automatically resolves Figma credent
 
 ---
 
+## Operating System & Binary Selection
+
+The `scripts/` directory provides native pre-compiled binaries for each operating system:
+
+| Operating System | Architecture | Binary Path |
+| :--- | :--- | :--- |
+| **Linux** | x86_64 / amd64 | `.agents/skills/figma-cli/scripts/fm` (or `fm-linux-amd64`) |
+| **macOS** | Apple Silicon (M1/M2/M3/M4, `arm64`) | `.agents/skills/figma-cli/scripts/fm-darwin-arm64` (or `fm-macos-arm64`) |
+| **macOS** | Intel (`amd64` / `x86_64`) | `.agents/skills/figma-cli/scripts/fm-darwin-amd64` (or `fm-macos-amd64`) |
+| **Windows** | x86_64 / 64-bit | `.agents/skills/figma-cli/scripts/fm.exe` (or `fm-windows-amd64.exe`) |
+
+> [!IMPORTANT]
+> **AI Agent Execution Rule**:
+> - Detect your current OS before running commands:
+>   - **macOS**: Check `uname -m`. On Apple Silicon (arm64), run `.agents/skills/figma-cli/scripts/fm-darwin-arm64`. On Intel, run `.agents/skills/figma-cli/scripts/fm-darwin-amd64`.
+>   - **Linux**: Run `.agents/skills/figma-cli/scripts/fm`.
+>   - **Windows**: Run `.agents/skills/figma-cli/scripts/fm.exe`.
+> - If running inside the repo or custom path, adjust the prefix accordingly (e.g. `skills/figma-cli/scripts/...`).
+
+---
+
 ## Standard 3-Step Workflow for Implementing Designs from Figma
 
 ### Step 1: Fetch Simplified Design Structure (`fm fetch`)
 
-Run `fm fetch` with the Figma URL (or `--file-key` and `--node-id`). By default it outputs the compact **Tree DSL** (`--format tree`) which saves 40%–55% context tokens compared to JSON:
+Run `fm fetch` using your OS-appropriate binary with the Figma URL (or `--file-key` and `--node-id`). By default it outputs the compact **Tree DSL** (`--format tree`) which saves 40%–55% context tokens compared to JSON:
 
 ```bash
-# Fetch directly from a Figma URL (automatically extracts fileKey and normalizes node-id)
+# macOS (Apple Silicon):
+.agents/skills/figma-cli/scripts/fm-darwin-arm64 fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34"
+
+# Linux:
 .agents/skills/figma-cli/scripts/fm fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34"
+
+# Windows (PowerShell):
+.agents/skills/figma-cli/scripts/fm.exe fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34"
 
 # For large screens, save to a file and inspect sections selectively
 .agents/skills/figma-cli/scripts/fm fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" -o /tmp/figma-design.tree
@@ -46,6 +73,7 @@ By default, `fm download` saves files to the OS temporary directory (`os.TempDir
 
 ```bash
 # Option A: Auto-discover and download ALL images & SVGs in a Figma URL/node to default OS tmp dir (or --dir)
+# Replace with your OS binary (e.g. .agents/skills/figma-cli/scripts/fm-darwin-arm64 on Apple Silicon Mac, .agents/skills/figma-cli/scripts/fm on Linux, .agents/skills/figma-cli/scripts/fm.exe on Windows)
 .agents/skills/figma-cli/scripts/fm download "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --dir ./public/images
 
 # Option B: Download specific items using --item shorthand

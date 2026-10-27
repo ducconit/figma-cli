@@ -1,12 +1,14 @@
+# Agent instructions & context
+!AGENTS.md
+
 # Compiled binaries & build outputs
 /fm
 /fm.exe
 /bin/
 /dist/
-skills/*/scripts/fm.exe
-!skills/figma-cli/scripts/fm
-.agents/skills/*/scripts/fm
-.agents/skills/*/scripts/fm.exe
+skills/*/scripts/*
+!skills/figma-cli/scripts/fm*
+.agents/skills/*/scripts/fm*
 
 # Environment & secrets
 .env

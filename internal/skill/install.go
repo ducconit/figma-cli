@@ -64,6 +64,9 @@ type InstallOptions struct {
 	// Agents lists AI agent names (e.g. "antigravity", "claude", "codex", "cursor", "all")
 	// whose skill directories should be symlinked to the installed canonical skill directory.
 	Agents        []string
+	// MultiOS explicitly controls whether SKILL.md documents multi-OS binaries (for npx skills add / repo bundle).
+	// If nil, it auto-detects: if scriptsDir contains multi-OS binaries (e.g. fm-darwin-* and fm.exe), it renders multi-OS; otherwise single-binary.
+	MultiOS       *bool
 }
 
 // InstallReport summarizes all paths and symlinks created or updated during `fm install`.
@@ -161,6 +164,14 @@ func Install(opts InstallOptions) (*InstallReport, error) {
 		}
 	}
 
+	multiOS := false
+	if opts.MultiOS != nil {
+		multiOS = *opts.MultiOS
+	} else {
+		multiOS = detectMultiOSBinaries(scriptsDir)
+	}
+	skillMDContent := renderSkillMarkdown(skillName, binInvocation, multiOS)
+
 	fileWG.Add(3)
 	go func() {
 		defer fileWG.Done()
@@ -170,7 +181,7 @@ func Install(opts InstallOptions) (*InstallReport, error) {
 	}()
 	go func() {
 		defer fileWG.Done()
-		if err := os.WriteFile(skillMDPath, []byte(renderSkillMarkdown(skillName, binInvocation)), 0o644); err != nil {
+		if err := os.WriteFile(skillMDPath, []byte(skillMDContent), 0o644); err != nil {
 			recordErr(fmt.Errorf("write SKILL.md: %w", err))
 		}
 	}()
@@ -485,7 +496,28 @@ func copyExecutable(src, dst string) error {
 	return os.Rename(tmpDst, dstAbs)
 }
 
-func renderSkillMarkdown(skillName, binPath string) string {
+func detectMultiOSBinaries(scriptsDir string) bool {
+	hasDarwin := fileExists(filepath.Join(scriptsDir, "fm-darwin-arm64")) ||
+		fileExists(filepath.Join(scriptsDir, "fm-darwin-amd64")) ||
+		fileExists(filepath.Join(scriptsDir, "fm-macos-arm64"))
+	hasWin := fileExists(filepath.Join(scriptsDir, "fm.exe")) ||
+		fileExists(filepath.Join(scriptsDir, "fm-windows-amd64.exe"))
+	return hasDarwin && hasWin
+}
+
+func fileExists(path string) bool {
+	info, err := os.Stat(path)
+	return err == nil && !info.IsDir()
+}
+
+func renderSkillMarkdown(skillName, binPath string, multiOS bool) string {
+	if multiOS {
+		return renderSkillMarkdownMultiOS(skillName, binPath)
+	}
+	return renderSkillMarkdownSingleOS(skillName, binPath)
+}
+
+func renderSkillMarkdownSingleOS(skillName, binPath string) string {
 	return fmt.Sprintf(`---
 name: %s
 description: >-
@@ -564,6 +596,143 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
 3. **TILE Mode Images**:
    - When `+"`scaleMode: TILE`"+` is present, copy the `+"`--original-width: ...; --original-height: ...;`"+` variables printed by `+"`fm download`"+` onto the element's inline style.
 `, skillName, binPath, binPath, binPath, binPath, binPath, binPath, binPath)
+}
+
+func renderSkillMarkdownMultiOS(skillName, binPath string) string {
+	scriptsDir := filepath.ToSlash(filepath.Dir(binPath))
+	macArmBin := scriptsDir + "/fm-darwin-arm64"
+	macAmdBin := scriptsDir + "/fm-darwin-amd64"
+	winBin := scriptsDir + "/fm.exe"
+	linuxBin := scriptsDir + "/fm"
+
+	return fmt.Sprintf(`---
+name: %s
+description: >-
+  Fetch simplified Figma design data (layout, Flexbox/CSS Grid, typography, rich text, colors, gradients, components)
+  and download/crop SVG, PNG, and GIF assets using the standalone cross-platform fm CLI binary in scripts/.
+  Use whenever the user shares a figma.com URL, fileKey, or asks to implement a UI from Figma.
+---
+
+# Figma Design & Asset Extraction Skill (`+"`fm`"+`)
+
+This universal AI Agent Skill provides a zero-dependency, cross-platform CLI (`+"`%s`"+`) compatible with any AI Coding Agent (Antigravity, Claude Code, Codex, Cursor, Windsurf, Copilot, OpenCode, Cline, etc.) and powered by the **Figma-Context-MCP** single-pass extraction engine. It converts raw Figma REST API payloads into a token-optimized **Tree DSL** (`+"`tree`"+`), `+"`yaml`"+`, or `+"`json`"+` and downloads/crops SVG, PNG, and GIF assets.
+
+## Authentication (Resolved on the Target Machine / Open Project)
+
+When `+"`fm`"+` runs on the installed machine, it automatically resolves Figma credentials in this strict priority order:
+1. **CLI flags**: `+"`--token <PAT>`"+` or `+"`--oauth-token <OAUTH>`"+`
+2. **Open Project `+"`.env`"+`**: The `+"`.env`"+` file at the root of the project currently open in the AI Agent (e.g., `+"`./.env`"+` in the workspace root, even when `+"`fm`"+` is located inside `+"`./.agents/skills/figma-cli/scripts/fm`"+`)
+3. **User Global `+"`~/.figma/.env`"+`**: The `+"`~/.figma/.env`"+` file in the user's home directory on the machine (can be set anytime via `+"`%s set-token <token>`"+`)
+4. **Device / OS Environment**: `+"`FIGMA_API_KEY`"+` (Personal Access Token) or `+"`FIGMA_OAUTH_TOKEN`"+` configured in the operating system environment
+
+---
+
+## Operating System & Binary Selection
+
+The `+"`scripts/`"+` directory provides native pre-compiled binaries for each operating system:
+
+| Operating System | Architecture | Binary Path |
+| :--- | :--- | :--- |
+| **Linux** | x86_64 / amd64 | `+"`%s`"+` (or `+"`fm-linux-amd64`"+`) |
+| **macOS** | Apple Silicon (M1/M2/M3/M4, `+"`arm64`"+`) | `+"`%s`"+` (or `+"`fm-macos-arm64`"+`) |
+| **macOS** | Intel (`+"`amd64`"+` / `+"`x86_64`"+`) | `+"`%s`"+` (or `+"`fm-macos-amd64`"+`) |
+| **Windows** | x86_64 / 64-bit | `+"`%s`"+` (or `+"`fm-windows-amd64.exe`"+`) |
+
+> [!IMPORTANT]
+> **AI Agent Execution Rule**:
+> - Detect your current OS before running commands:
+>   - **macOS**: Check `+"`uname -m`"+`. On Apple Silicon (arm64), run `+"`%s`"+`. On Intel, run `+"`%s`"+`.
+>   - **Linux**: Run `+"`%s`"+`.
+>   - **Windows**: Run `+"`%s`"+`.
+> - If running inside the repo or custom path, adjust the prefix accordingly (e.g. `+"`skills/figma-cli/scripts/...`"+`).
+
+---
+
+## Standard 3-Step Workflow for Implementing Designs from Figma
+
+### Step 1: Fetch Simplified Design Structure (`+"`fm fetch`"+`)
+
+Run `+"`fm fetch`"+` using your OS-appropriate binary with the Figma URL (or `+"`--file-key`"+` and `+"`--node-id`"+`). By default it outputs the compact **Tree DSL** (`+"`--format tree`"+`) which saves 40%%–55%% context tokens compared to JSON:
+
+`+"```bash"+`
+# macOS (Apple Silicon):
+%s fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34"
+
+# Linux:
+%s fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34"
+
+# Windows (PowerShell):
+%s fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34"
+
+# For large screens, save to a file and inspect sections selectively
+%s fetch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" -o /tmp/figma-design.tree
+`+"```"+`
+
+For details on reading the `+"`tree`"+` DSL format (`+"`GLOBAL_VARS`"+`, `+"`ELEMENTS`"+` templates `+"`EL-xxxxxxxx`"+`, and inline rich-text `+"`{ts1}...{/ts1}`"+` tags), read [references/tree-dsl.md](./references/tree-dsl.md).
+
+### Step 2: Download SVG Icons & Raster Images (`+"`fm download`"+`)
+
+Inspect the `+"`NODES`"+` and `+"`GLOBAL_VARS`"+` output from Step 1:
+- Nodes with `+"`[IMAGE-SVG]`"+` are vector icons/illustrations automatically collapsed by `+"`fm`"+` into a single downloadable SVG leaf.
+- Fills with `+"`type: IMAGE`"+` (containing `+"`imageRef`"+`, `+"`gifRef`"+`, or `+"`imageDownloadArguments`"+` with `+"`cropTransform`"+` / `+"`filenameSuffix`"+`) are raster images.
+
+By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`os.TempDir()`"+`). Pass `+"`--dir <path>`"+` to save directly into your project's asset directory (e.g., `+"`./public/images`"+` or `+"`./src/assets`"+`):
+
+`+"```bash"+`
+# Option A: Auto-discover and download ALL images & SVGs in a Figma URL/node to default OS tmp dir (or --dir)
+# Replace with your OS binary (e.g. %s on Apple Silicon Mac, %s on Linux, %s on Windows)
+%s download "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --dir ./public/images
+
+# Option B: Download specific items using --item shorthand
+%s download <fileKey> --dir ./public/images \
+  --item "nodeId=10:22,file=ic-heart.svg" \
+  --item "nodeId=10:25,imageRef=8f9a1b2c,file=hero.png"
+
+# Option C: Download with full cropTransform / TILE dimension metadata via JSON manifest
+%s download <fileKey> --dir ./public/images --manifest '[
+  {
+    "nodeId": "10:25",
+    "imageRef": "8f9a1b2c",
+    "fileName": "hero.png",
+    "filenameSuffix": "3a9f1c",
+    "needsCropping": true,
+    "cropTransform": [[0.5, 0, 0.25], [0, 0.5, 0.1]]
+  }
+]'
+`+"```"+`
+
+### Step 3: Map Simplified Properties to Code
+
+1. **Layout (`+"`mode: row | column | grid | none`"+`)**:
+   - `+"`sizing.horizontal / vertical`"+`: `+"`fixed`"+` (use `+"`dimensions.width/height`"+`), `+"`fill`"+` (`+"`flex: 1`"+` / `+"`w-full`"+`), `+"`hug`"+` (`+"`w-fit`"+`), or `+"`contextual`"+` on the root node (use responsive container with `+"`designedWidth`"+` as a max-width hint).
+2. **Colors & Gradients**:
+   - Stacked solid fills are already alpha-blended into a single hex/rgba color.
+   - Linear, radial, angular (`+"`conic-gradient`"+`), and diamond gradients are pre-converted to valid CSS syntax.
+3. **TILE Mode Images**:
+   - When `+"`scaleMode: TILE`"+` is present, copy the `+"`--original-width: ...; --original-height: ...;`"+` variables printed by `+"`fm download`"+` onto the element's inline style.
+`,
+		skillName,
+		binPath,
+		binPath,
+		linuxBin,
+		macArmBin,
+		macAmdBin,
+		winBin,
+		macArmBin,
+		macAmdBin,
+		linuxBin,
+		winBin,
+		macArmBin,
+		linuxBin,
+		winBin,
+		binPath,
+		macArmBin,
+		linuxBin,
+		winBin,
+		binPath,
+		binPath,
+		binPath,
+	)
 }
 
 func renderTreeDSLReference() string {

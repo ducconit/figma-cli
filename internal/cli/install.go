@@ -29,6 +29,7 @@ func newInstallCmd(global *GlobalFlags) *cobra.Command {
 		flagOpen    bool
 		flagCline   bool
 		flagAll     bool
+		flagMultiOS bool
 	)
 
 	cmd := &cobra.Command{
@@ -105,6 +106,11 @@ Examples:
 				agents = append(agents, "all")
 			}
 
+			var multiOSOpt *bool
+			if cmd.Flags().Changed("multi-os") {
+				multiOSOpt = &flagMultiOS
+			}
+
 			report, err := skill.Install(skill.InstallOptions{
 				Path:       skillsPath,
 				TargetDir:  targetDir,
@@ -115,6 +121,7 @@ Examples:
 				TargetOS:   targetOS,
 				Global:     globalMode,
 				Agents:     agents,
+				MultiOS:    multiOSOpt,
 			})
 			if err != nil {
 				return err
@@ -157,6 +164,7 @@ Examples:
 	cmd.Flags().BoolVar(&flagOpen, "opencode", false, "Create symlink in OpenCode skills directory (~/.config/opencode/skills)")
 	cmd.Flags().BoolVar(&flagCline, "cline", false, "Create symlink in Cline skills directory (~/.cline/skills)")
 	cmd.Flags().BoolVarP(&flagAll, "all", "a", false, "Create symlinks for all supported AI agents")
+	cmd.Flags().BoolVar(&flagMultiOS, "multi-os", false, "Generate multi-OS documentation in SKILL.md (used when bundling scripts for all platforms, e.g. for npx skills add)")
 	cmd.Flags().StringSliceVar(&agentList, "agent", nil, "Agent name(s) to symlink (antigravity|agy, claude, codex, cursor, windsurf, copilot, opencode, cline, all)")
 
 	// Backward-compatible & internal test flags

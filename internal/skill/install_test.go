@@ -161,3 +161,56 @@ func TestInstallCustomProjectPathAndWindowsBinary(t *testing.T) {
 		t.Fatal("expected error for unsupported agent target")
 	}
 }
+
+func TestInstallSingleOSVsMultiOSRendering(t *testing.T) {
+	fakeHome := t.TempDir()
+	fakeBinary := filepath.Join(t.TempDir(), "fm-bin")
+	if err := os.WriteFile(fakeBinary, []byte("#!/bin/sh\necho test\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	// 1. Single-OS installation (default fm install): only 1 binary in scripts, no multi-OS table
+	singleReport, err := Install(InstallOptions{
+		HomeDir:       fakeHome,
+		BinarySrcPath: fakeBinary,
+		TargetOS:      "darwin",
+	})
+	if err != nil {
+		t.Fatalf("single-OS install failed: %v", err)
+	}
+	singleBytes, err := os.ReadFile(singleReport.SkillMDPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	singleContent := string(singleBytes)
+	if strings.Contains(singleContent, "Operating System & Binary Selection") {
+		t.Fatalf("single-OS SKILL.md should NOT contain multi-OS table, got:\n%s", singleContent)
+	}
+	if !strings.Contains(singleContent, "scripts/fm fetch") {
+		t.Fatalf("expected single binary invocation in SKILL.md, got:\n%s", singleContent)
+	}
+
+	// 2. Multi-OS installation (for repo / npx skills add): contains multi-OS table & architecture guidance
+	multiHome := t.TempDir()
+	trueVal := true
+	multiReport, err := Install(InstallOptions{
+		HomeDir:       multiHome,
+		BinarySrcPath: fakeBinary,
+		TargetOS:      "linux",
+		MultiOS:       &trueVal,
+	})
+	if err != nil {
+		t.Fatalf("multi-OS install failed: %v", err)
+	}
+	multiBytes, err := os.ReadFile(multiReport.SkillMDPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	multiContent := string(multiBytes)
+	if !strings.Contains(multiContent, "Operating System & Binary Selection") {
+		t.Fatalf("multi-OS SKILL.md MUST contain Operating System & Binary Selection section, got:\n%s", multiContent)
+	}
+	if !strings.Contains(multiContent, "fm-darwin-arm64") || !strings.Contains(multiContent, "fm.exe") {
+		t.Fatalf("expected multi-OS binaries documented in SKILL.md, got:\n%s", multiContent)
+	}
+}

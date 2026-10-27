@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F24E1E"/>
+      <stop offset="25%" stop-color="#FF7262"/>
+      <stop offset="50%" stop-color="#A259FF"/>
+      <stop offset="75%" stop-color="#1ABCFE"/>
+      <stop offset="100%" stop-color="#0ACF83"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1F2937" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#111827" stop-opacity="0.98"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#374151" stroke-width="0.6" stroke-opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect width="1280" height="640" fill="url(#grid)"/>
+
+  <!-- Decorative Glow Orbs -->
+  <circle cx="200" cy="120" r="180" fill="#A259FF" opacity="0.14"/>
+  <circle cx="1060" cy="460" r="220" fill="#1ABCFE" opacity="0.14"/>
+  <circle cx="680" cy="80" r="140" fill="#0ACF83" opacity="0.09"/>
+  <circle cx="80" cy="540" r="160" fill="#F24E1E" opacity="0.08"/>
+
+  <!-- Top Category Badge -->
+  <g transform="translate(80, 56)">
+    <rect x="0" y="0" width="310" height="32" rx="16" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <circle cx="16" cy="16" r="5" fill="#0ACF83"/>
+    <text x="32" y="21" font-family="JetBrains Mono, monospace" font-size="12" font-weight="600" fill="#94A3B8">
+      AI AGENT SKILL &amp; DEVELOPER TOOL
+    </text>
+  </g>
+
+  <!-- Left Section: Branding & Features -->
+  <g transform="translate(80, 115)">
+    <!-- Figma Logo Emblem -->
+    <g transform="translate(0, 8)">
+      <rect x="0" y="0" width="88" height="88" rx="22" fill="#1F2937" stroke="#374151" stroke-width="1.5"/>
+      <!-- Figma 5 color petals -->
+      <path d="M30 20 H44 V36 H30 A8 8 0 0 1 30 20 Z" fill="#F24E1E"/>
+      <path d="M44 20 H58 A8 8 0 0 1 58 36 H44 V20 Z" fill="#FF7262"/>
+      <path d="M30 36 H44 V52 H30 A8 8 0 0 1 30 36 Z" fill="#A259FF"/>
+      <circle cx="51" cy="44" r="8" fill="#1ABCFE"/>
+      <path d="M30 52 H44 V60 A8 8 0 0 1 28 60 A8 8 0 0 1 30 52 Z" fill="#0ACF83"/>
+    </g>
+
+    <!-- Title & Description -->
+    <text x="112" y="48" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="48" font-weight="900" fill="#F9FAFB" letter-spacing="-0.03em">
+      figma-cli <tspan fill="#1ABCFE" font-family="JetBrains Mono, monospace" font-size="38">(fm)</tspan>
+    </text>
+    <text x="112" y="86" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="600" fill="#E2E8F0">
+      Native Figma Design &amp; Asset Extraction Engine
+    </text>
+    <text x="112" y="112" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="500" fill="#94A3B8">
+      Universal AI Agent Skill for Antigravity, Claude Code, Codex, Cursor &amp; Windsurf
+    </text>
+
+    <!-- Gradient Divider -->
+    <rect x="0" y="146" width="580" height="4" rx="2" fill="url(#accent)"/>
+
+    <!-- Key Metrics / Feature Pills Row 1 -->
+    <g transform="translate(0, 178)" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600">
+      <rect x="0" y="0" width="170" height="34" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="85" y="22" fill="#38BDF8" text-anchor="middle">⚡ Golang Pure Bin</text>
+
+      <rect x="182" y="0" width="186" height="34" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="275" y="22" fill="#A78BFA" text-anchor="middle">📉 40-55% Less Tokens</text>
+
+      <rect x="380" y="0" width="190" height="34" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="475" y="22" fill="#34D399" text-anchor="middle">🖥️ Linux • macOS • Win</text>
+    </g>
+
+    <!-- Key Metrics / Feature Pills Row 2 -->
+    <g transform="translate(0, 224)" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600">
+      <rect x="0" y="0" width="220" height="34" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="110" y="22" fill="#FB923C" text-anchor="middle">📦 npx skills add figma-cli</text>
+
+      <rect x="232" y="0" width="210" height="34" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="337" y="22" fill="#F472B6" text-anchor="middle">🖼️ Streaming Crop &amp; SVG</text>
+
+      <rect x="454" y="0" width="116" height="34" rx="10" fill="#1E293B" stroke="#334155"/>
+      <text x="512" y="22" fill="#E2E8F0" text-anchor="middle">🔒 Zero Deps</text>
+    </g>
+
+    <!-- Author & Ecosystem Footer -->
+    <g transform="translate(0, 290)">
+      <text x="0" y="20" font-family="Inter, -apple-system, sans-serif" font-size="14" font-weight="500" fill="#6B7280">
+        Crafted by <tspan fill="#F3F4F6" font-weight="700">DNT (github.com/ducconit)</tspan> • Open Source • Apache-2.0
+      </text>
+      <text x="0" y="44" font-family="JetBrains Mono, monospace" font-size="12" fill="#4B5563">
+        Compatible: OpenCode • Antigravity • Claude Code • Cursor • Windsurf • Codex • Cline
+      </text>
+    </g>
+  </g>
+
+  <!-- Right Section: Terminal Preview Card -->
+  <g transform="translate(710, 80)">
+    <rect x="0" y="0" width="490" height="470" rx="18" fill="url(#cardGrad)" stroke="#374151" stroke-width="1.5"/>
+    
+    <!-- Window Controls -->
+    <circle cx="26" cy="24" r="6.5" fill="#EF4444"/>
+    <circle cx="48" cy="24" r="6.5" fill="#F59E0B"/>
+    <circle cx="70" cy="24" r="6.5" fill="#10B981"/>
+    <text x="245" y="28" font-family="JetBrains Mono, monospace" font-size="12.5" fill="#6B7280" text-anchor="middle">terminal ~ figma-cli</text>
+    <line x1="0" y1="46" x2="490" y2="46" stroke="#374151" stroke-width="1"/>
+
+    <!-- Terminal Code Simulation -->
+    <g transform="translate(24, 76)" font-family="JetBrains Mono, monospace" font-size="13" line-height="1.6">
+      <!-- Step 1: Install -->
+      <text x="0" y="0" fill="#10B981">$ <tspan fill="#F9FAFB">npx skills add ducconit/figma-cli</tspan></text>
+      <text x="0" y="24" fill="#9CA3AF">✓ Skill added: <tspan fill="#E2E8F0">.agents/skills/figma-cli</tspan></text>
+      <text x="0" y="46" fill="#9CA3AF">✓ Multi-OS binaries: <tspan fill="#38BDF8">Linux</tspan> • <tspan fill="#A78BFA">macOS</tspan> • <tspan fill="#34D399">Windows</tspan></text>
+
+      <!-- Step 2: Fetch Design -->
+      <text x="0" y="86" fill="#10B981">$ <tspan fill="#F9FAFB">fm fetch "https://figma.com/design/..."</tspan></text>
+      <text x="0" y="110" fill="#6B7280"># Token-optimized Tree DSL (-52% tokens):</text>
+      <text x="0" y="134" fill="#38BDF8">[FRAME] <tspan fill="#FDE047">"PricingCard"</tspan> <tspan fill="#A78BFA">#10:20</tspan> layout=col gap=16</text>
+      <text x="16" y="156" fill="#34D399">[IMAGE-SVG] <tspan fill="#FDE047">"icon-check"</tspan> <tspan fill="#A78BFA">#10:21</tspan></text>
+      <text x="16" y="178" fill="#F472B6">[TEXT] <tspan fill="#A78BFA">#10:22</tspan> text=<tspan fill="#86EFAC">"**Pro Plan**"</tspan> fills=p_600</text>
+      <text x="16" y="200" fill="#E2E8F0">[INSTANCE] <tspan fill="#FDE047">"BtnCTA"</tspan> template=<tspan fill="#93C5FD">EL-9a8b1c</tspan></text>
+
+      <!-- Step 3: Download Assets -->
+      <text x="0" y="240" fill="#10B981">$ <tspan fill="#F9FAFB">fm download &lt;url&gt; --dir ./public/assets</tspan></text>
+      <text x="0" y="264" fill="#9CA3AF">✓ Downloaded &amp; cropped 14 assets:</text>
+      <text x="16" y="286" fill="#38BDF8">↳ hero-banner.png <tspan fill="#6B7280">(1200x600 affine crop)</tspan></text>
+      <text x="16" y="308" fill="#34D399">↳ ic-check.svg <tspan fill="#6B7280">(24x24 vector collapse)</tspan></text>
+      <text x="0" y="336" fill="#FBBF24">⚡ Ready to code with AI Agent in 1s!</text>
+    </g>
+  </g>
+</svg>
