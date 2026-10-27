@@ -75,12 +75,9 @@ chmod +x fm
 ./fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN
 ```
 
-#### Trên macOS (Apple Silicon M1/M2/M3 hoặc Intel)
+#### Trên macOS (Apple Silicon M1/M2/M3/M4)
 ```bash
-# Đối với chip Apple Silicon (M1/M2/M3/M4):
 curl -fsSL https://github.com/ducconit/figma-cli/releases/latest/download/fm-darwin-arm64 -o fm
-# (Hoặc đối với chip Intel: thay bằng fm-darwin-amd64)
-
 chmod +x fm
 ./fm install --all
 ./fm set-token figd_YOUR_PERSONAL_ACCESS_TOKEN

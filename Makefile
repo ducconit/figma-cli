@@ -24,11 +24,8 @@ test:
 install-skill: build
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o skills/figma-cli/scripts/$(BINARY_NAME) ./cmd/fm
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS) -o skills/figma-cli/scripts/$(BINARY_NAME)-darwin-arm64 ./cmd/fm
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o skills/figma-cli/scripts/$(BINARY_NAME)-darwin-amd64 ./cmd/fm
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o skills/figma-cli/scripts/$(BINARY_NAME).exe ./cmd/fm
-	chmod +x skills/figma-cli/scripts/$(BINARY_NAME) skills/figma-cli/scripts/$(BINARY_NAME)-darwin-*
-	@ln -sf $(BINARY_NAME)-darwin-arm64 skills/figma-cli/scripts/$(BINARY_NAME)-macos-arm64
-	@ln -sf $(BINARY_NAME)-darwin-amd64 skills/figma-cli/scripts/$(BINARY_NAME)-macos-amd64
+	chmod +x skills/figma-cli/scripts/$(BINARY_NAME) skills/figma-cli/scripts/$(BINARY_NAME)-darwin-arm64
 	@ln -sf $(BINARY_NAME).exe skills/figma-cli/scripts/$(BINARY_NAME)-windows-amd64.exe
 	@ln -sf $(BINARY_NAME) skills/figma-cli/scripts/$(BINARY_NAME)-linux-amd64
 	./$(BINARY_NAME) install --path skills --os linux --multi-os

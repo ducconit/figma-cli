@@ -27,14 +27,13 @@ The `scripts/` directory provides native pre-compiled binaries for each operatin
 | Operating System | Architecture | Binary Path |
 | :--- | :--- | :--- |
 | **Linux** | x86_64 / amd64 | `.agents/skills/figma-cli/scripts/fm` (or `fm-linux-amd64`) |
-| **macOS** | Apple Silicon (M1/M2/M3/M4, `arm64`) | `.agents/skills/figma-cli/scripts/fm-darwin-arm64` (or `fm-macos-arm64`) |
-| **macOS** | Intel (`amd64` / `x86_64`) | `.agents/skills/figma-cli/scripts/fm-darwin-amd64` (or `fm-macos-amd64`) |
+| **macOS** | Apple Silicon (M1/M2/M3/M4, `arm64`) | `.agents/skills/figma-cli/scripts/fm-darwin-arm64` |
 | **Windows** | x86_64 / 64-bit | `.agents/skills/figma-cli/scripts/fm.exe` (or `fm-windows-amd64.exe`) |
 
 > [!IMPORTANT]
 > **AI Agent Execution Rule**:
 > - Detect your current OS before running commands:
->   - **macOS**: Check `uname -m`. On Apple Silicon (arm64), run `.agents/skills/figma-cli/scripts/fm-darwin-arm64`. On Intel, run `.agents/skills/figma-cli/scripts/fm-darwin-amd64`.
+>   - **macOS**: Run `.agents/skills/figma-cli/scripts/fm-darwin-arm64`.
 >   - **Linux**: Run `.agents/skills/figma-cli/scripts/fm`.
 >   - **Windows**: Run `.agents/skills/figma-cli/scripts/fm.exe`.
 > - If running inside the repo or custom path, adjust the prefix accordingly (e.g. `skills/figma-cli/scripts/...`).

@@ -497,9 +497,7 @@ func copyExecutable(src, dst string) error {
 }
 
 func detectMultiOSBinaries(scriptsDir string) bool {
-	hasDarwin := fileExists(filepath.Join(scriptsDir, "fm-darwin-arm64")) ||
-		fileExists(filepath.Join(scriptsDir, "fm-darwin-amd64")) ||
-		fileExists(filepath.Join(scriptsDir, "fm-macos-arm64"))
+	hasDarwin := fileExists(filepath.Join(scriptsDir, "fm-darwin-arm64"))
 	hasWin := fileExists(filepath.Join(scriptsDir, "fm.exe")) ||
 		fileExists(filepath.Join(scriptsDir, "fm-windows-amd64.exe"))
 	return hasDarwin && hasWin
@@ -601,7 +599,6 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
 func renderSkillMarkdownMultiOS(skillName, binPath string) string {
 	scriptsDir := filepath.ToSlash(filepath.Dir(binPath))
 	macArmBin := scriptsDir + "/fm-darwin-arm64"
-	macAmdBin := scriptsDir + "/fm-darwin-amd64"
 	winBin := scriptsDir + "/fm.exe"
 	linuxBin := scriptsDir + "/fm"
 
@@ -634,14 +631,13 @@ The `+"`scripts/`"+` directory provides native pre-compiled binaries for each op
 | Operating System | Architecture | Binary Path |
 | :--- | :--- | :--- |
 | **Linux** | x86_64 / amd64 | `+"`%s`"+` (or `+"`fm-linux-amd64`"+`) |
-| **macOS** | Apple Silicon (M1/M2/M3/M4, `+"`arm64`"+`) | `+"`%s`"+` (or `+"`fm-macos-arm64`"+`) |
-| **macOS** | Intel (`+"`amd64`"+` / `+"`x86_64`"+`) | `+"`%s`"+` (or `+"`fm-macos-amd64`"+`) |
+| **macOS** | Apple Silicon (M1/M2/M3/M4, `+"`arm64`"+`) | `+"`%s`"+` |
 | **Windows** | x86_64 / 64-bit | `+"`%s`"+` (or `+"`fm-windows-amd64.exe`"+`) |
 
 > [!IMPORTANT]
 > **AI Agent Execution Rule**:
 > - Detect your current OS before running commands:
->   - **macOS**: Check `+"`uname -m`"+`. On Apple Silicon (arm64), run `+"`%s`"+`. On Intel, run `+"`%s`"+`.
+>   - **macOS**: Run `+"`%s`"+`.
 >   - **Linux**: Run `+"`%s`"+`.
 >   - **Windows**: Run `+"`%s`"+`.
 > - If running inside the repo or custom path, adjust the prefix accordingly (e.g. `+"`skills/figma-cli/scripts/...`"+`).
@@ -716,10 +712,8 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
 		binPath,
 		linuxBin,
 		macArmBin,
-		macAmdBin,
 		winBin,
 		macArmBin,
-		macAmdBin,
 		linuxBin,
 		winBin,
 		macArmBin,
