@@ -593,7 +593,35 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
    - Linear, radial, angular (`+"`conic-gradient`"+`), and diamond gradients are pre-converted to valid CSS syntax.
 3. **TILE Mode Images**:
    - When `+"`scaleMode: TILE`"+` is present, copy the `+"`--original-width: ...; --original-height: ...;`"+` variables printed by `+"`fm download`"+` onto the element's inline style.
-`, skillName, binPath, binPath, binPath, binPath, binPath, binPath, binPath)
+
+---
+
+## Additional Capabilities
+
+### Extract Design Tokens (`+"`fm tokens`"+`)
+
+Extract Figma Variables (colors, spacing, radii, dark/light modes) into CSS Variables, Tailwind, or JSON:
+
+`+"```bash"+`
+# Export CSS variables (:root / .dark)
+%s tokens "https://www.figma.com/design/<fileKey>/<fileName>" --format css -o ./src/styles/tokens.css
+
+# Export Tailwind config extension
+%s tokens <fileKey> --format tailwind -o ./tailwind.tokens.js
+`+"```"+`
+
+### Manage Dev Mode Resources (`+"`fm link`"+`)
+
+Attach or view code implementation links (GitHub PR, Storybook, Jira) directly on Figma nodes:
+
+`+"```bash"+`
+# Attach a link to a node
+%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --url "https://github.com/org/repo/pull/42" --name "PR #42"
+
+# List links on a node or file
+%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --list
+`+"```"+`
+`, skillName, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath)
 }
 
 func renderSkillMarkdownMultiOS(skillName, binPath string) string {
@@ -706,6 +734,34 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
    - Linear, radial, angular (`+"`conic-gradient`"+`), and diamond gradients are pre-converted to valid CSS syntax.
 3. **TILE Mode Images**:
    - When `+"`scaleMode: TILE`"+` is present, copy the `+"`--original-width: ...; --original-height: ...;`"+` variables printed by `+"`fm download`"+` onto the element's inline style.
+
+---
+
+## Additional Capabilities
+
+### Extract Design Tokens (`+"`fm tokens`"+`)
+
+Extract Figma Variables (colors, spacing, radii, dark/light modes) into CSS Variables, Tailwind, or JSON:
+
+`+"```bash"+`
+# Export CSS variables (:root / .dark)
+%s tokens "https://www.figma.com/design/<fileKey>/<fileName>" --format css -o ./src/styles/tokens.css
+
+# Export Tailwind config extension
+%s tokens <fileKey> --format tailwind -o ./tailwind.tokens.js
+`+"```"+`
+
+### Manage Dev Mode Resources (`+"`fm link`"+`)
+
+Attach or view code implementation links (GitHub PR, Storybook, Jira) directly on Figma nodes:
+
+`+"```bash"+`
+# Attach a link to a node
+%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --url "https://github.com/org/repo/pull/42" --name "PR #42"
+
+# List links on a node or file
+%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --list
+`+"```"+`
 `,
 		skillName,
 		binPath,
@@ -723,6 +779,10 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
 		macArmBin,
 		linuxBin,
 		winBin,
+		binPath,
+		binPath,
+		binPath,
+		binPath,
 		binPath,
 		binPath,
 		binPath,

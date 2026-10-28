@@ -205,7 +205,9 @@ Mở bất kỳ AI Agent nào (Google Antigravity, Claude Code, OpenAI Codex, Cu
 | Command | Ví dụ Cú pháp Thông dụng | Mô tả Ngắn gọn |
 | :--- | :--- | :--- |
 | **`fm fetch`** | `fm fetch <url-figma> -o /tmp/screen.tree` | Trích xuất cây layout, styles, typography sang Tree DSL (tiết kiệm 40%–55% token). |
+| **`fm tokens`** | `fm tokens <url-figma> --format css` *(hoặc `tailwind`, `json`)* | Trích xuất Figma Variables thành CSS Variables (`:root`/`.dark`), Tailwind Config JS hoặc JSON. |
 | **`fm download`** | `fm download <url-figma> --dir ./public/images` | Tải toàn bộ hình ảnh, GIF và icon vector SVG tự động (mặc định lưu `/tmp`). |
+| **`fm link`** | `fm link <url-figma> --url <pr-link> --name "PR #42"` | Gắn, liệt kê (`--list`) hoặc xóa (`--delete`) dev resource links (PR, Storybook, Jira) trên Figma node. |
 | **`fm update`** | `fm update` *(hoặc `fm update --check`)* | Tự động kiểm tra và nâng cấp lên phiên bản mới nhất từ GitHub Releases. |
 | **`fm set-token`** | `fm set-token figd_xxx` | Lưu Personal Access Token vào file bảo mật `~/.figma/.env`. |
 | **`fm install`** | `fm install --all` (hoặc `--agy --claude --codex`) | Cài đặt skill và tạo symlink tự động sang thư mục của các AI Coding Agent. |

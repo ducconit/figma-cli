@@ -208,3 +208,138 @@ func TestClientOAuthGetRawNodeImageFillsAndDownloadToFile(t *testing.T) {
 		t.Fatal("expected error for 404 DownloadToFile")
 	}
 }
+
+func TestClientVariablesAndDevResources(t *testing.T) {
+	mux := http.NewServeMux()
+
+	// 1. Local Variables endpoint
+	mux.HandleFunc("/files/test-vars/variables/local", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{
+			"status": 200,
+			"error": false,
+			"meta": {
+				"variables": {
+					"var-1": {
+						"id": "var-1",
+						"name": "colors/primary",
+						"key": "key-1",
+						"variableCollectionId": "col-1",
+						"resolvedType": "COLOR",
+						"valuesByMode": {
+							"m1": {"r": 0.2, "g": 0.4, "b": 0.8, "a": 1.0}
+						}
+					}
+				},
+				"variableCollections": {
+					"col-1": {
+						"id": "col-1",
+						"name": "Theme",
+						"key": "colkey-1",
+						"defaultModeId": "m1",
+						"modes": [{"modeId": "m1", "name": "Light"}]
+					}
+				}
+			}
+		}`))
+	})
+
+	// 2. Dev Resources endpoint
+	mux.HandleFunc("/files/test-dev/dev_resources", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			nodeIDs := r.URL.Query().Get("node_ids")
+			if nodeIDs == "12:34" {
+				_, _ = w.Write([]byte(`{
+					"links": [
+						{"id": "link-1", "name": "Storybook", "url": "https://storybook.example.com", "file_key": "test-dev", "node_id": "12:34"}
+					]
+				}`))
+			} else {
+				_, _ = w.Write([]byte(`{
+					"links": [
+						{"id": "link-1", "name": "Storybook", "url": "https://storybook.example.com", "file_key": "test-dev", "node_id": "12:34"},
+						{"id": "link-2", "name": "PR 42", "url": "https://github.com/org/repo/pull/42", "file_key": "test-dev", "node_id": "56:78"}
+					]
+				}`))
+			}
+		case http.MethodPost:
+			var reqPayload struct {
+				DevResources []DevResourceInput `json:"dev_resources"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&reqPayload); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			if len(reqPayload.DevResources) == 0 || reqPayload.DevResources[0].NodeID != "12:34" {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			_, _ = w.Write([]byte(`{
+				"links": [
+					{"id": "link-new", "name": "` + reqPayload.DevResources[0].Name + `", "url": "` + reqPayload.DevResources[0].URL + `", "file_key": "test-dev", "node_id": "12:34"}
+				]
+			}`))
+		default:
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	})
+
+	// 3. Delete Dev Resource endpoint
+	mux.HandleFunc("/files/test-dev/dev_resources/link-1", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	client, err := NewClient(config.AuthConfig{APIKey: "pat_test"}, "none")
+	if err != nil {
+		t.Fatal(err)
+	}
+	client.SetBaseURL(srv.URL)
+
+	// Test GetLocalVariables
+	vars, err := client.GetLocalVariables(context.Background(), "test-vars")
+	if err != nil {
+		t.Fatalf("GetLocalVariables failed: %v", err)
+	}
+	if len(vars.Variables) != 1 || vars.Variables["var-1"].Name != "colors/primary" {
+		t.Fatalf("unexpected variables: %+v", vars)
+	}
+	if len(vars.VariableCollections) != 1 || vars.VariableCollections["col-1"].Name != "Theme" {
+		t.Fatalf("unexpected collections: %+v", vars)
+	}
+
+	// Test GetDevResources (all vs specific node)
+	allLinks, err := client.GetDevResources(context.Background(), "test-dev", nil)
+	if err != nil || len(allLinks) != 2 {
+		t.Fatalf("GetDevResources(all) failed: %+v (err=%v)", allLinks, err)
+	}
+	nodeLinks, err := client.GetDevResources(context.Background(), "test-dev", []string{"12-34"})
+	if err != nil || len(nodeLinks) != 1 || nodeLinks[0].ID != "link-1" {
+		t.Fatalf("GetDevResources(node) failed: %+v (err=%v)", nodeLinks, err)
+	}
+
+	// Test CreateDevResources
+	created, err := client.CreateDevResources(context.Background(), "test-dev", []DevResourceInput{
+		{Name: "New PR", URL: "https://github.com/org/repo/pull/99", NodeID: "12-34"},
+	})
+	if err != nil || len(created) != 1 || created[0].ID != "link-new" {
+		t.Fatalf("CreateDevResources failed: %+v (err=%v)", created, err)
+	}
+
+	// Test DeleteDevResource
+	if err := client.DeleteDevResource(context.Background(), "test-dev", "link-1"); err != nil {
+		t.Fatalf("DeleteDevResource failed: %v", err)
+	}
+}

@@ -109,6 +109,8 @@ Authentication is resolved in order:
 	rootCmd.AddCommand(
 		newFetchCmd(&flags),
 		newDownloadCmd(&flags),
+		newTokensCmd(&flags),
+		newLinkCmd(&flags),
 		newInstallCmd(&flags),
 		newSetTokenCmd(),
 		newUpdateCmd(&flags),

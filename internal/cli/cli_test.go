@@ -44,7 +44,7 @@ func TestVersionAndHelpCommands(t *testing.T) {
 	}
 
 	// 3. fm -h and subcommands -h
-	for _, sub := range [][]string{{"-h"}, {"fetch", "-h"}, {"download", "-h"}, {"install", "-h"}, {"set-token", "-h"}, {"update", "-h"}} {
+	for _, sub := range [][]string{{"-h"}, {"fetch", "-h"}, {"download", "-h"}, {"tokens", "-h"}, {"link", "-h"}, {"install", "-h"}, {"set-token", "-h"}, {"update", "-h"}} {
 		helpOut, err := executeCLI(t, sub...)
 		if err != nil {
 			t.Fatalf("fm %v failed: %v", sub, err)
@@ -252,5 +252,127 @@ func TestUpdateCLICommand(t *testing.T) {
 	}
 	if !strings.Contains(outJSON, `"hasUpdate": true`) || !strings.Contains(outJSON, `"latestVersion": "9.9.9"`) {
 		t.Fatalf("unexpected json output:\n%s", outJSON)
+	}
+}
+
+func TestTokensCLICommand(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/variables/local") {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{
+				"status": 200,
+				"error": false,
+				"meta": {
+					"variables": {
+						"v-1": {
+							"id": "v-1",
+							"name": "Colors/Brand",
+							"variableCollectionID": "col-1",
+							"resolvedType": "COLOR",
+							"valuesByMode": {
+								"m-light": {"r": 0.1, "g": 0.2, "b": 0.8, "a": 1.0}
+							}
+						}
+					},
+					"variableCollections": {
+						"col-1": {
+							"id": "col-1",
+							"name": "Global",
+							"defaultModeId": "m-light",
+							"modes": [{"modeId": "m-light", "name": "Light"}]
+						}
+					}
+				}
+			}`))
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer mockServer.Close()
+
+	// 1. fm tokens with URL and default CSS output
+	outCSS, err := executeCLI(t, "tokens", "https://www.figma.com/design/abc123XYZ/Tokens", "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm tokens failed: %v\nOutput: %s", err, outCSS)
+	}
+	if !strings.Contains(outCSS, ":root {") || !strings.Contains(outCSS, "--colors-brand:") {
+		t.Fatalf("unexpected CSS output:\n%s", outCSS)
+	}
+
+	// 2. fm tokens with --format tailwind
+	outTW, err := executeCLI(t, "tokens", "--file-key", "abc123XYZ", "--format", "tailwind", "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm tokens --format tailwind failed: %v", err)
+	}
+	if !strings.Contains(outTW, "module.exports") || !strings.Contains(outTW, "colors:") {
+		t.Fatalf("unexpected Tailwind output:\n%s", outTW)
+	}
+
+	// 3. fm tokens -o <file> with --format json
+	destFile := filepath.Join(t.TempDir(), "tokens.json")
+	outSave, err := executeCLI(t, "tokens", "--file-key", "abc123XYZ", "--format", "json", "-o", destFile, "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm tokens -o failed: %v\nOutput: %s", err, outSave)
+	}
+	data, err := os.ReadFile(destFile)
+	if err != nil || !strings.Contains(string(data), `"collections"`) {
+		t.Fatalf("failed to read written tokens file: %v (data=%s)", err, string(data))
+	}
+}
+
+func TestLinkCLICommand(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if strings.HasSuffix(r.URL.Path, "/dev_resources/res-1") && r.Method == http.MethodDelete {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		if strings.HasSuffix(r.URL.Path, "/dev_resources") {
+			switch r.Method {
+			case http.MethodGet:
+				_, _ = w.Write([]byte(`{
+					"links": [
+						{"id": "res-1", "name": "PR 42", "url": "https://github.com/org/repo/pull/42", "file_key": "abc123XYZ", "node_id": "12:34"}
+					]
+				}`))
+			case http.MethodPost:
+				_, _ = w.Write([]byte(`{
+					"links": [
+						{"id": "res-new", "name": "Storybook", "url": "https://storybook.example.com", "file_key": "abc123XYZ", "node_id": "12:34"}
+					]
+				}`))
+			}
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer mockServer.Close()
+
+	// 1. fm link create with URL and node-id
+	outCreate, err := executeCLI(t, "link", "https://www.figma.com/design/abc123XYZ/App?node-id=12-34",
+		"--url", "https://storybook.example.com", "--name", "Storybook", "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm link create failed: %v\nOutput: %s", err, outCreate)
+	}
+	if !strings.Contains(outCreate, "Attached dev resource") || !strings.Contains(outCreate, "Storybook") {
+		t.Fatalf("unexpected link create output:\n%s", outCreate)
+	}
+
+	// 2. fm link --list
+	outList, err := executeCLI(t, "link", "--file-key", "abc123XYZ", "--list", "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm link --list failed: %v", err)
+	}
+	if !strings.Contains(outList, "PR 42") || !strings.Contains(outList, "https://github.com/org/repo/pull/42") {
+		t.Fatalf("unexpected link list output:\n%s", outList)
+	}
+
+	// 3. fm link --delete
+	outDel, err := executeCLI(t, "link", "--file-key", "abc123XYZ", "--delete", "res-1", "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm link --delete failed: %v", err)
+	}
+	if !strings.Contains(outDel, "Deleted dev resource res-1") {
+		t.Fatalf("unexpected link delete output:\n%s", outDel)
 	}
 }

@@ -17,7 +17,9 @@ Tài liệu hướng dẫn toàn diện từ A-Z về cài đặt, cấu hình, 
    - [`fm install` — Cài đặt Universal Agent Skill](#fm-install--cài-đặt-universal-agent-skill)
    - [`fm set-token` — Lưu Access Token an toàn](#fm-set-token--lưu-access-token-an-toàn)
    - [`fm fetch` — Trích xuất & Tối ưu Cây Thiết kế](#fm-fetch--trích-xuất--tối-ưu-cây-thiết-kế)
+   - [`fm tokens` — Trích xuất Design Tokens (CSS / Tailwind / JSON)](#fm-tokens--trích-xuất-design-tokens-css--tailwind--json)
    - [`fm download` — Tải & Cắt Tài nguyên Đa luồng](#fm-download--tải--cắt-tài-nguyên-đa-luồng)
+   - [`fm link` — Quản lý Dev Resources & Code Links](#fm-link--quản-lý-dev-resources--code-links)
    - [`fm update` — Tự động Cập nhật Phiên bản Mới](#fm-update--tự-động-cập-nhật-phiên-bản-mới)
    - [`fm version` & `fm help`](#fm-version--fm-help)
 6. [💡 Best Practices & Kịch bản Tương tác cùng AI Agent](#6--best-practices--kịch-bản-tương-tác-cùng-ai-agent)
@@ -170,7 +172,9 @@ flowchart TD
 | **`fm install`** | `fm install [flags]` | Cài đặt Agent Skill vào `~/.agents/skills/figma-cli` (hoặc `--path`) và tạo symlink tự động cho từng Agent. |
 | **`fm set-token`** | `fm set-token <token> [--oauth]` | Lưu hoặc cập nhật Access Token vào duy nhất file `~/.figma/.env`. |
 | **`fm fetch`** | `fm fetch <url-or-key> [flags]` | Tải và tinh gọn cây thiết kế thành Tree DSL (tiết kiệm 40%–55% token), YAML hoặc JSON. |
+| **`fm tokens`** | `fm tokens <url-or-key> [flags]` | Trích xuất Figma Variables thành CSS Variables (`:root`/`.dark`), Tailwind Config JS hoặc JSON. |
 | **`fm download`** | `fm download <url-or-key> [flags]` | Tải hình ảnh, GIF và SVG đa luồng. Mặc định lưu vào `/tmp`, hỗ trợ cắt ảnh affine crop. |
+| **`fm link`** | `fm link <url-or-key> [flags]` | Gắn, xem danh sách hoặc xóa dev resource links (GitHub PR, Storybook, Jira) trên Figma nodes. |
 | **`fm update`** | `fm update [flags]` | Tự động kiểm tra và nâng cấp binary lên phiên bản phát hành mới nhất từ GitHub Releases. |
 | **`fm version`** | `fm version [--json]` *(hoặc `fm -v`)* | Hiển thị phiên bản, commit hash, ngày build và thông tin Go runtime. |
 | **`fm help`** | `fm -h` / `fm <cmd> -h` | Hiển thị hướng dẫn chi tiết và ví dụ cho từng lệnh. |
@@ -265,6 +269,31 @@ Tree DSL được tối ưu để tiết kiệm 40%–55% token so với JSON:
 
 ---
 
+### `fm tokens` — Trích xuất Design Tokens (CSS / Tailwind / JSON)
+
+Trích xuất toàn bộ Figma Variables (Design Tokens) bao gồm màu sắc (`COLOR`), kích thước khoảng cách/bo góc (`FLOAT`), chuỗi (`STRING`), logic (`BOOLEAN`) và chế độ theme (Light/Dark hoặc đa chế độ) thông qua Figma Variables REST API:
+
+```bash
+# 1. Trích xuất CSS Variables mặc định sang stdout (:root cho Light mode và .dark cho Dark mode)
+fm tokens "https://www.figma.com/design/abc123XYZ/Design-System"
+
+# 2. Xuất file CSS hoàn chỉnh sẵn sàng import vào dự án
+fm tokens --file-key abc123XYZ --format css -o ./src/styles/tokens.css
+
+# 3. Xuất snippet cấu hình theme extension cho Tailwind CSS
+fm tokens --file-key abc123XYZ --format tailwind -o ./tailwind.tokens.js
+
+# 4. Xuất dữ liệu token dạng JSON cấu trúc (đã khử alias loop an toàn)
+fm tokens abc123XYZ --format json -o ./tokens.json
+```
+
+#### Đặc điểm kỹ thuật của bộ xử lý Tokens:
+- **Tự động giải quyết Alias (`VARIABLE_ALIAS`)**: Khi biến A tham chiếu biến B, `fm` tự động truy vết giá trị gốc và giải quyết theo đúng mode tương ứng.
+- **Phát hiện & Chặn lặp vô tận (Cycle Detection)**: Tự động phát hiện các vòng lặp tham chiếu chéo (`A -> B -> A`) với ngưỡng độ sâu đệ quy tối đa 20 bước, không bao giờ gây tràn ngăn xếp (stack overflow).
+- **Chuẩn hóa Bộ chọn CSS**: Tự động chuyển đổi tên biến Figma có dấu gạch chéo (`Colors/Primary/500`) thành CSS variable hợp lệ (`--colors-primary-500`). Mode "Dark" được tự động gán vào class `.dark`, các mode khác được phân loại vào `[data-theme="..."]`.
+
+---
+
 ### `fm download` — Tải & Cắt Tài nguyên Đa luồng
 
 Tải ảnh raster (PNG, JPEG), ảnh động GIF và vector SVG từ Figma:
@@ -293,6 +322,26 @@ fm download abc123XYZ --dir ./public/assets --manifest '[
     "requiresImageDimensions": true
   }
 ]'
+```
+
+---
+
+### `fm link` — Quản lý Dev Resources & Code Links
+
+Gắn, xem danh sách hoặc gỡ bỏ các liên kết tài nguyên phát triển (GitHub Pull Requests, Storybook Stories, Jira Tickets, tài liệu kỹ thuật) trực tiếp trên từng Figma node thông qua Figma Dev Resources REST API (Dev Mode):
+
+```bash
+# 1. Gắn link GitHub PR hoặc Storybook vào một Figma node cụ thể
+fm link "https://www.figma.com/design/abc123XYZ/App?node-id=12-34" \
+  --url "https://github.com/org/repo/pull/42" \
+  --name "PR #42: Header Component Implementation"
+
+# 2. Liệt kê danh sách tất cả dev resources đã gắn trên file hoặc node
+fm link "https://www.figma.com/design/abc123XYZ/App?node-id=12-34" --list
+fm link --file-key abc123XYZ --list --json
+
+# 3. Xóa một dev resource theo ID
+fm link --file-key abc123XYZ --delete 98765
 ```
 
 ---

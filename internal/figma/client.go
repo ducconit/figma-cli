@@ -1,6 +1,7 @@
 package figma
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -124,20 +125,32 @@ func (c *Client) applyAuthHeaders(req *http.Request) error {
 	return nil
 }
 
-// RequestJSON performs an authenticated GET request to the Figma API and returns the decoded JSON map and raw byte size.
-func (c *Client) RequestJSON(ctx context.Context, endpoint string) (map[string]any, int, error) {
+// doRequest handles authenticated HTTP requests with secret redaction and error formatting.
+func (c *Client) doRequest(ctx context.Context, method, endpoint string, body any) ([]byte, error) {
 	fullURL := c.baseURL + endpoint
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fullURL, nil)
+	var bodyReader io.Reader
+	if body != nil {
+		data, err := json.Marshal(body)
+		if err != nil {
+			return nil, fmt.Errorf("marshal request body for %s: %w", endpoint, err)
+		}
+		bodyReader = bytes.NewReader(data)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
 	if err != nil {
-		return nil, 0, fmt.Errorf("create request for %s: %w", endpoint, err)
+		return nil, fmt.Errorf("create request for %s: %w", endpoint, err)
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
 	}
 	if err := c.applyAuthHeaders(req); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, 0, fmt.Errorf("network error requesting %s: %w", endpoint, err)
+		return nil, fmt.Errorf("network error requesting %s: %w", endpoint, err)
 	}
 	defer resp.Body.Close()
 
@@ -155,15 +168,24 @@ func (c *Client) RequestJSON(ctx context.Context, endpoint string) (map[string]a
 		}
 		switch resp.StatusCode {
 		case http.StatusTooManyRequests:
-			return nil, 0, fmt.Errorf("%s: %w", BuildRateLimitMessage(httpErr), httpErr)
+			return nil, fmt.Errorf("%s: %w", BuildRateLimitMessage(httpErr), httpErr)
 		case http.StatusForbidden:
-			return nil, 0, fmt.Errorf("%s: %w", BuildForbiddenMessage(endpoint, httpErr, c.proxyMode), httpErr)
+			return nil, fmt.Errorf("%s: %w", BuildForbiddenMessage(endpoint, httpErr, c.proxyMode), httpErr)
 		default:
-			return nil, 0, fmt.Errorf("failed request to Figma API endpoint '%s': %w", endpoint, httpErr)
+			return nil, fmt.Errorf("failed request to Figma API endpoint '%s': %w", endpoint, httpErr)
 		}
 	}
 	if readErr != nil {
-		return nil, 0, fmt.Errorf("read response body from %s: %w", endpoint, readErr)
+		return nil, fmt.Errorf("read response body from %s: %w", endpoint, readErr)
+	}
+	return bodyBytes, nil
+}
+
+// RequestJSON performs an authenticated GET request to the Figma API and returns the decoded JSON map and raw byte size.
+func (c *Client) RequestJSON(ctx context.Context, endpoint string) (map[string]any, int, error) {
+	bodyBytes, err := c.doRequest(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, 0, err
 	}
 
 	var decoded map[string]any
@@ -374,4 +396,181 @@ func (c *Client) DownloadToFile(ctx context.Context, imageURL, destPath string) 
 		return fmt.Errorf("finalize file %s: %w", destPath, err)
 	}
 	return nil
+}
+
+// VariableMode represents a mode in a Figma variable collection (e.g. Light / Dark).
+type VariableMode struct {
+	ModeID string `json:"modeId"`
+	Name   string `json:"name"`
+}
+
+// VariableCollection represents a group of variables with shared modes.
+type VariableCollection struct {
+	ID                   string         `json:"id"`
+	Name                 string         `json:"name"`
+	Key                  string         `json:"key"`
+	Modes                []VariableMode `json:"modes"`
+	DefaultModeID        string         `json:"defaultModeId"`
+	Remote               bool           `json:"remote"`
+	HiddenFromPublishing bool           `json:"hiddenFromPublishing"`
+	VariableIDs          []string       `json:"variableIds"`
+}
+
+// VariableCodeSyntax contains platform-specific code syntax representations.
+type VariableCodeSyntax struct {
+	Web     string `json:"WEB,omitempty"`
+	Android string `json:"ANDROID,omitempty"`
+	IOS     string `json:"iOS,omitempty"`
+}
+
+// Variable represents a Figma design token / variable definition.
+type Variable struct {
+	ID                   string              `json:"id"`
+	Name                 string              `json:"name"`
+	Key                  string              `json:"key"`
+	VariableCollectionID string              `json:"variableCollectionId"`
+	ResolvedType         string              `json:"resolvedType"` // "COLOR", "FLOAT", "STRING", "BOOLEAN"
+	ValuesByMode         map[string]any      `json:"valuesByMode"`
+	Remote               bool                `json:"remote"`
+	Description          string              `json:"description"`
+	HiddenFromPublishing bool                `json:"hiddenFromPublishing"`
+	Scopes               []string            `json:"scopes"`
+	CodeSyntax           *VariableCodeSyntax `json:"codeSyntax,omitempty"`
+}
+
+// VariablesMeta represents the meta container returned by Figma Variables API.
+type VariablesMeta struct {
+	Variables           map[string]Variable           `json:"variables"`
+	VariableCollections map[string]VariableCollection `json:"variableCollections"`
+}
+
+// VariablesResponse is the top-level payload returned by GET /v1/files/:file_key/variables/local.
+type VariablesResponse struct {
+	Status int           `json:"status"`
+	Error  bool          `json:"error"`
+	Meta   VariablesMeta `json:"meta"`
+}
+
+// GetLocalVariables fetches all local variables and variable collections for a file.
+func (c *Client) GetLocalVariables(ctx context.Context, fileKey string) (*VariablesMeta, error) {
+	endpoint := fmt.Sprintf("/files/%s/variables/local", url.PathEscape(fileKey))
+	bodyBytes, err := c.doRequest(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp VariablesResponse
+	if err := json.Unmarshal(bodyBytes, &resp); err != nil {
+		return nil, fmt.Errorf("decode variables from %s: %w", endpoint, err)
+	}
+	if resp.Error {
+		return nil, fmt.Errorf("figma variables API returned error (status %d)", resp.Status)
+	}
+	return &resp.Meta, nil
+}
+
+// DevResource represents a code or external documentation link attached to a Figma node.
+type DevResource struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+	FileKey string `json:"file_key"`
+	NodeID  string `json:"node_id"`
+}
+
+// DevResourceInput represents payload parameters for creating a Dev Resource.
+type DevResourceInput struct {
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+	FileKey string `json:"file_key"`
+	NodeID  string `json:"node_id"`
+}
+
+type devResourcesPayload struct {
+	DevResources []DevResourceInput `json:"dev_resources"`
+}
+
+type devResourcesResp struct {
+	Links        []DevResource `json:"links"`
+	DevResources []DevResource `json:"dev_resources"`
+	Errors       []any         `json:"errors"`
+}
+
+// GetDevResources retrieves dev resources attached to the file or specific nodes.
+func (c *Client) GetDevResources(ctx context.Context, fileKey string, nodeIDs []string) ([]DevResource, error) {
+	q := url.Values{}
+	if len(nodeIDs) > 0 {
+		normalized := make([]string, 0, len(nodeIDs))
+		for _, id := range nodeIDs {
+			n := NormalizeNodeID(id)
+			if n != "" {
+				normalized = append(normalized, n)
+			}
+		}
+		if len(normalized) > 0 {
+			q.Set("node_ids", strings.Join(normalized, ","))
+		}
+	}
+
+	endpoint := fmt.Sprintf("/files/%s/dev_resources", url.PathEscape(fileKey))
+	if encoded := q.Encode(); encoded != "" {
+		endpoint += "?" + encoded
+	}
+
+	bodyBytes, err := c.doRequest(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp devResourcesResp
+	if err := json.Unmarshal(bodyBytes, &resp); err != nil {
+		return nil, fmt.Errorf("decode dev resources: %w", err)
+	}
+	if len(resp.Links) > 0 {
+		return resp.Links, nil
+	}
+	return resp.DevResources, nil
+}
+
+// CreateDevResources creates one or more dev resources attached to Figma nodes.
+func (c *Client) CreateDevResources(ctx context.Context, fileKey string, resources []DevResourceInput) ([]DevResource, error) {
+	endpoint := fmt.Sprintf("/files/%s/dev_resources", url.PathEscape(fileKey))
+	normalizedResources := make([]DevResourceInput, len(resources))
+	for i, r := range resources {
+		fk := r.FileKey
+		if fk == "" {
+			fk = fileKey
+		}
+		normalizedResources[i] = DevResourceInput{
+			Name:    r.Name,
+			URL:     r.URL,
+			FileKey: fk,
+			NodeID:  NormalizeNodeID(r.NodeID),
+		}
+	}
+
+	payload := devResourcesPayload{
+		DevResources: normalizedResources,
+	}
+
+	bodyBytes, err := c.doRequest(ctx, http.MethodPost, endpoint, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp devResourcesResp
+	if err := json.Unmarshal(bodyBytes, &resp); err != nil {
+		return nil, fmt.Errorf("decode create dev resources response: %w", err)
+	}
+	if len(resp.Links) > 0 {
+		return resp.Links, nil
+	}
+	return resp.DevResources, nil
+}
+
+// DeleteDevResource deletes a specific dev resource by ID.
+func (c *Client) DeleteDevResource(ctx context.Context, fileKey, devResourceID string) error {
+	endpoint := fmt.Sprintf("/files/%s/dev_resources/%s", url.PathEscape(fileKey), url.PathEscape(devResourceID))
+	_, err := c.doRequest(ctx, http.MethodDelete, endpoint, nil)
+	return err
 }
