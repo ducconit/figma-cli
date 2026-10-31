@@ -109,15 +109,86 @@ By default, `fm download` saves files to the OS temporary directory (`os.TempDir
 
 ### Extract Design Tokens (`fm tokens`)
 
-Extract Figma Variables (colors, spacing, radii, dark/light modes) into CSS Variables, Tailwind, or JSON:
+Extract Figma Variables (colors, spacing, radii, typography, dark/light modes) into CSS Variables, Tailwind v3/v4 (`@theme`), SwiftUI (`DesignTokens`), DTCG (W3C standard), or JSON:
 
 ```bash
 # Export CSS variables (:root / .dark)
 .agents/skills/figma-cli/scripts/fm tokens "https://www.figma.com/design/<fileKey>/<fileName>" --format css -o ./src/styles/tokens.css
 
-# Export Tailwind config extension
+# Export Tailwind v4 @theme CSS
+.agents/skills/figma-cli/scripts/fm tokens <fileKey> --format tailwind-v4 -o ./src/styles/theme.css
+
+# Export Tailwind v3 config extension
 .agents/skills/figma-cli/scripts/fm tokens <fileKey> --format tailwind -o ./tailwind.tokens.js
+
+# Export native SwiftUI enum
+.agents/skills/figma-cli/scripts/fm tokens <fileKey> --format swiftui -o ./DesignTokens.swift
+
+# Export W3C Design Token Community Group (DTCG) JSON
+.agents/skills/figma-cli/scripts/fm tokens <fileKey> --format dtcg -o ./tokens.json
 ```
+
+### Visual Screenshots (`fm screenshot`)
+
+Render and download pixel-accurate PNG, JPG, or SVG visual snapshots of Figma frames or components for automated visual verification:
+
+```bash
+# Render a 2x PNG screenshot of a frame
+.agents/skills/figma-cli/scripts/fm screenshot "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --scale 2 -o ./tmp/screenshot.png
+
+# Output screenshot URL and file metadata as JSON
+.agents/skills/figma-cli/scripts/fm screenshot <fileKey> --node-id 12:34 --json
+```
+
+### Motion & Prototype Animations (`fm motion`)
+
+Extract prototype interactions, smart animate transitions, durations, and cubic-bezier easing curves into CSS `@keyframes`, Framer Motion / `motion.dev`, or JSON:
+
+```bash
+# Export CSS @keyframes and transition utility classes
+.agents/skills/figma-cli/scripts/fm motion "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --format css -o ./src/styles/motion.css
+
+# Export Framer Motion / motion.dev transition configs
+.agents/skills/figma-cli/scripts/fm motion <fileKey> --node-id 12:34 --format framer -o ./src/motion.ts
+```
+
+### Code Connect (`fm code-connect`)
+
+Scan local frontend components (`.tsx`, `.jsx`, `.vue`, `.swift`), fuzzy-match them against Figma components/component sets, generate parserless `.figma.ts` templates, and attach Dev Resources:
+
+```bash
+# Scan local directory and report match percentages against Figma
+.agents/skills/figma-cli/scripts/fm code-connect scan "https://www.figma.com/design/<fileKey>/<fileName>" --dir ./src
+
+# Generate .figma.ts Code Connect templates for matched components
+.agents/skills/figma-cli/scripts/fm code-connect generate <fileKey> --dir ./src --out-dir ./figma
+
+# Attach repository source URLs to Figma component nodes via Dev Resources API
+.agents/skills/figma-cli/scripts/fm code-connect link <fileKey> --dir ./src --repo-url "https://github.com/my-org/my-repo/blob/main"
+```
+
+### Model Context Protocol (MCP) Server (`fm mcp`)
+
+Start a zero-dependency JSON-RPC 2.0 MCP server over stdio for AI Coding Agents (Antigravity, Cursor, Claude Code, Windsurf):
+
+```json
+{
+  "mcpServers": {
+    "figma-cli": {
+      "command": "/path/to/fm",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+Exposed MCP tools:
+- `get_design_context`: Fetch and simplify Figma Design trees into token-efficient Tree DSL, YAML, or JSON.
+- `get_screenshot`: Render high-DPI screenshots of frames/nodes for visual verification.
+- `get_tokens`: Extract Figma Variables into CSS, Tailwind v3/v4, SwiftUI, DTCG, or JSON.
+- `get_motion_context`: Extract prototype animations, transitions, and easing curves.
+- `download_assets`: Auto-discover, download, and crop SVG/PNG/GIF assets.
+- `code_connect`: Match codebase components with Figma components and generate `.figma.ts`.
 
 ### Manage Dev Mode Resources (`fm link`)
 

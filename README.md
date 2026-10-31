@@ -204,10 +204,14 @@ Mở bất kỳ AI Agent nào (Google Antigravity, Claude Code, OpenAI Codex, Cu
 
 | Command | Ví dụ Cú pháp Thông dụng | Mô tả Ngắn gọn |
 | :--- | :--- | :--- |
-| **`fm fetch`** | `fm fetch <url-figma> -o /tmp/screen.tree` | Trích xuất cây layout, styles, typography sang Tree DSL (tiết kiệm 40%–55% token). |
-| **`fm tokens`** | `fm tokens <url-figma> --format css` *(hoặc `tailwind`, `json`)* | Trích xuất Figma Variables thành CSS Variables (`:root`/`.dark`), Tailwind Config JS hoặc JSON. |
+| **`fm fetch`** | `fm fetch <url-figma> -o /tmp/screen.tree` | Trích xuất cây layout, styles, typography sang Tree DSL (tiết kiệm 40%–55% token, hỗ trợ cả `/branch/` URL). |
+| **`fm screenshot`** | `fm screenshot <url-figma> -o ./tmp/screen.png` | Render ảnh chụp node/frame chất lượng cao (`png`, `jpg`, `svg`) để đối chiếu giao diện trực quan. |
+| **`fm motion`** | `fm motion <url-figma> --format framer` *(hoặc `css`, `json`)* | Bóc tách Prototype transitions, durations & cubic-bezier easing sang CSS `@keyframes` hoặc Framer Motion. |
+| **`fm tokens`** | `fm tokens <url-figma> --format tailwind-v4` *(hoặc `css`, `tailwind`, `swiftui`, `dtcg`, `json`)* | Trích xuất Figma Variables thành CSS Variables, Tailwind v3/v4, SwiftUI `DesignTokens`, W3C DTCG hoặc JSON. |
+| **`fm code-connect`** | `fm code-connect generate <url-figma> --dir ./src` | Quét component trong repo (`.tsx`, `.vue`, `.swift`), khớp với Figma Component và sinh file `.figma.ts`. |
 | **`fm download`** | `fm download <url-figma> --dir ./public/images` | Tải toàn bộ hình ảnh, GIF và icon vector SVG tự động (mặc định lưu `/tmp`). |
 | **`fm link`** | `fm link <url-figma> --url <pr-link> --name "PR #42"` | Gắn, liệt kê (`--list`) hoặc xóa (`--delete`) dev resource links (PR, Storybook, Jira) trên Figma node. |
+| **`fm mcp`** | `fm mcp` | Khởi chạy Local Stdio MCP Server tích hợp sẵn 6 công cụ Figma Design cho AI Agent. |
 | **`fm update`** | `fm update` *(hoặc `fm update --check`)* | Tự động kiểm tra và nâng cấp lên phiên bản mới nhất từ GitHub Releases. |
 | **`fm set-token`** | `fm set-token figd_xxx` | Lưu Personal Access Token vào file bảo mật `~/.figma/.env`. |
 | **`fm install`** | `fm install --all` (hoặc `--agy --claude --codex`) | Cài đặt skill và tạo symlink tự động sang thư mục của các AI Coding Agent. |

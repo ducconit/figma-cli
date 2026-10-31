@@ -340,16 +340,23 @@ func firstNonEmpty(values ...string) string {
 }
 
 func applySupplementalEnv(projMap, homeMap map[string]string) {
-	isAuthKey := func(k string) bool {
-		return k == "FIGMA_API_KEY" || k == "FIGMA_TOKEN" || k == "FIGMA_OAUTH_TOKEN"
+	isBlockedKey := func(k string) bool {
+		upper := strings.ToUpper(strings.TrimSpace(k))
+		switch upper {
+		case "FIGMA_API_KEY", "FIGMA_TOKEN", "FIGMA_OAUTH_TOKEN":
+			return true
+		case "PATH", "SHELL", "LD_PRELOAD", "LD_LIBRARY_PATH", "DYLD_INSERT_LIBRARIES":
+			return true
+		}
+		return false
 	}
 	for k, v := range homeMap {
-		if !isAuthKey(k) && strings.TrimSpace(v) != "" {
+		if !isBlockedKey(k) && strings.TrimSpace(v) != "" {
 			_ = os.Setenv(k, v)
 		}
 	}
 	for k, v := range projMap {
-		if !isAuthKey(k) && strings.TrimSpace(v) != "" {
+		if !isBlockedKey(k) && strings.TrimSpace(v) != "" {
 			_ = os.Setenv(k, v)
 		}
 	}

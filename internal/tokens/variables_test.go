@@ -281,3 +281,140 @@ func TestExportTailwindAndJSON(t *testing.T) {
 		t.Fatal("expected error for invalid format")
 	}
 }
+
+func TestExportTokensTailwindV4SwiftUIAndDTCG(t *testing.T) {
+	meta := &figma.VariablesMeta{
+		VariableCollections: map[string]figma.VariableCollection{
+			"col-1": {
+				ID:            "col-1",
+				Name:          "Design System",
+				DefaultModeID: "m1",
+				Modes:         []figma.VariableMode{{ModeID: "m1", Name: "Light"}},
+			},
+		},
+		Variables: map[string]figma.Variable{
+			"v-col": {
+				ID:                   "v-col",
+				Name:                 "Colors/Brand/Primary",
+				Description:          "Primary brand color",
+				VariableCollectionID: "col-1",
+				ResolvedType:         "COLOR",
+				ValuesByMode:         map[string]any{"m1": map[string]any{"r": 0.2, "g": 0.4, "b": 0.8, "a": 1.0}},
+			},
+			"v-sp": {
+				ID:                   "v-sp",
+				Name:                 "Spacing/Md",
+				VariableCollectionID: "col-1",
+				ResolvedType:         "FLOAT",
+				ValuesByMode:         map[string]any{"m1": 16.0},
+			},
+			"v-rad": {
+				ID:                   "v-rad",
+				Name:                 "Radius/Card",
+				VariableCollectionID: "col-1",
+				ResolvedType:         "FLOAT",
+				ValuesByMode:         map[string]any{"m1": 12.0},
+			},
+		},
+	}
+
+	// 1. Tailwind v4 (@theme)
+	fmtTW4, err := ParseFormat("tw4")
+	if err != nil || fmtTW4 != FormatTailwindV4 {
+		t.Fatalf("expected FormatTailwindV4, got %q (err: %v)", fmtTW4, err)
+	}
+	tw4, err := Export(meta, FormatTailwindV4)
+	if err != nil {
+		t.Fatalf("Export(TailwindV4) failed: %v", err)
+	}
+	if !strings.Contains(tw4, "@theme {") || !strings.Contains(tw4, "--color-brand-primary: #3366CC;") || !strings.Contains(tw4, "--spacing-md: 16px;") || !strings.Contains(tw4, "--radius-card: 12px;") {
+		t.Errorf("unexpected TailwindV4 output:\n%s", tw4)
+	}
+
+	// 2. SwiftUI
+	fmtSwift, err := ParseFormat("swift")
+	if err != nil || fmtSwift != FormatSwiftUI {
+		t.Fatalf("expected FormatSwiftUI, got %q (err: %v)", fmtSwift, err)
+	}
+	swiftCode, err := Export(meta, FormatSwiftUI)
+	if err != nil {
+		t.Fatalf("Export(SwiftUI) failed: %v", err)
+	}
+	if !strings.Contains(swiftCode, "import SwiftUI") || !strings.Contains(swiftCode, "public enum DesignTokens") || !strings.Contains(swiftCode, "colorsBrandPrimary = Color(") || !strings.Contains(swiftCode, "spacingMd: CGFloat = 16") {
+		t.Errorf("unexpected SwiftUI output:\n%s", swiftCode)
+	}
+
+	// 3. W3C DTCG
+	fmtDTCG, err := ParseFormat("dtcg")
+	if err != nil || fmtDTCG != FormatDTCG {
+		t.Fatalf("expected FormatDTCG, got %q (err: %v)", fmtDTCG, err)
+	}
+	dtcgJSON, err := Export(meta, FormatDTCG)
+	if err != nil {
+		t.Fatalf("Export(DTCG) failed: %v", err)
+	}
+	if !strings.Contains(dtcgJSON, `"$value": "#3366CC"`) || !strings.Contains(dtcgJSON, `"$type": "color"`) || !strings.Contains(dtcgJSON, `"$description": "Primary brand color"`) {
+		t.Errorf("unexpected DTCG output:\n%s", dtcgJSON)
+	}
+
+	// 4. SwiftUI 3+ colliding token names across collections must produce unique identifiers (colorsPrimary, colorsPrimary2, colorsPrimary3)
+	collidingMeta := &figma.VariablesMeta{
+		VariableCollections: map[string]figma.VariableCollection{
+			"c1": {ID: "c1", Name: "Col1", DefaultModeID: "m1", Modes: []figma.VariableMode{{ModeID: "m1", Name: "Default"}}},
+			"c2": {ID: "c2", Name: "Col2", DefaultModeID: "m1", Modes: []figma.VariableMode{{ModeID: "m1", Name: "Default"}}},
+			"c3": {ID: "c3", Name: "Col3", DefaultModeID: "m1", Modes: []figma.VariableMode{{ModeID: "m1", Name: "Default"}}},
+		},
+		Variables: map[string]figma.Variable{
+			"v1": {ID: "v1", Name: "Colors/Primary", VariableCollectionID: "c1", ResolvedType: "STRING", ValuesByMode: map[string]any{"m1": "one"}},
+			"v2": {ID: "v2", Name: "Colors/Primary", VariableCollectionID: "c2", ResolvedType: "STRING", ValuesByMode: map[string]any{"m1": "two"}},
+			"v3": {ID: "v3", Name: "Colors/Primary", VariableCollectionID: "c3", ResolvedType: "STRING", ValuesByMode: map[string]any{"m1": "three"}},
+		},
+	}
+	collidingSwift, err := Export(collidingMeta, FormatSwiftUI)
+	if err != nil {
+		t.Fatalf("Export colliding SwiftUI failed: %v", err)
+	}
+	if !strings.Contains(collidingSwift, "let colorsPrimary:") || !strings.Contains(collidingSwift, "let colorsPrimary2:") || !strings.Contains(collidingSwift, "let colorsPrimary3:") {
+		t.Errorf("expected colorsPrimary, colorsPrimary2, and colorsPrimary3 in SwiftUI output:\n%s", collidingSwift)
+	}
+}
+
+func TestTokenCommentSanitization(t *testing.T) {
+	meta := &figma.VariablesMeta{
+		VariableCollections: map[string]figma.VariableCollection{
+			"c1": {
+				ID:            "c1",
+				Name:          "Theme\nimport Foundation\n//",
+				DefaultModeID: "m1",
+				Modes:         []figma.VariableMode{{ModeID: "m1", Name: "Default*/body{color:red;}/*"}},
+			},
+		},
+		Variables: map[string]figma.Variable{
+			"v1": {
+				ID:                   "v1",
+				Name:                 "Colors/Bg",
+				VariableCollectionID: "c1",
+				ResolvedType:         "COLOR",
+				ValuesByMode:         map[string]any{"m1": map[string]any{"r": 1.0, "g": 1.0, "b": 1.0, "a": 1.0}},
+			},
+		},
+	}
+
+	swiftOut, err := Export(meta, FormatSwiftUI)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, l := range strings.Split(swiftOut, "\n") {
+		if strings.HasPrefix(l, "import Foundation") {
+			t.Fatalf("SwiftUI comment breakout succeeded:\n%s", swiftOut)
+		}
+	}
+
+	cssOut, err := Export(meta, FormatCSS)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(cssOut, "*/body") {
+		t.Fatalf("CSS block comment escape succeeded:\n%s", cssOut)
+	}
+}

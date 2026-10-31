@@ -109,8 +109,12 @@ Authentication is resolved in order:
 	rootCmd.AddCommand(
 		newFetchCmd(&flags),
 		newDownloadCmd(&flags),
+		newScreenshotCmd(&flags),
+		newMotionCmd(&flags),
 		newTokensCmd(&flags),
+		newCodeConnectCmd(&flags),
 		newLinkCmd(&flags),
+		newMCPCmd(&flags),
 		newInstallCmd(&flags),
 		newSetTokenCmd(),
 		newUpdateCmd(&flags),

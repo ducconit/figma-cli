@@ -22,6 +22,15 @@ func TestParseFigmaURLAndResolveTarget(t *testing.T) {
 		t.Fatalf("unexpected URLParts: %+v", parts)
 	}
 
+	// Branch URL resolution: /design/:fileKey/branch/:branchKey/:fileName -> FileKey must be branchKey
+	branchParts, err := ParseFigmaURL("https://www.figma.com/design/abc123XYZ/branch/br987ZYX/My-App?node-id=10-20")
+	if err != nil {
+		t.Fatalf("unexpected branch URL error: %v", err)
+	}
+	if branchParts.FileKey != "br987ZYX" || branchParts.NodeID != "10:20" {
+		t.Fatalf("expected branchKey br987ZYX and nodeID 10:20, got %+v", branchParts)
+	}
+
 	// Unsupported /proto/ URL
 	if _, err := ParseFigmaURL("https://www.figma.com/proto/abc123XYZ/My-App"); err == nil {
 		t.Fatal("expected error for /proto/ URL")

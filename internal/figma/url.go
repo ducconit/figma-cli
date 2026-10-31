@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	figmaPathPattern  = regexp.MustCompile(`^/(file|design)/([a-zA-Z0-9]+)`)
+	figmaPathPattern  = regexp.MustCompile(`^/(file|design)/([a-zA-Z0-9]+)(?:/branch/([a-zA-Z0-9]+))?`)
 	fileKeyPattern    = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
 	nodeIDPattern     = regexp.MustCompile(`^I?\d+[:|-]\d+(?:;\d+[:|-]\d+)*$`)
 	nodeIDFileCleaner = strings.NewReplacer(":", "_", ";", "_")
@@ -88,6 +88,9 @@ func ParseFigmaURL(input string) (URLParts, error) {
 	}
 
 	fileKey := matches[2]
+	if len(matches) >= 4 && matches[3] != "" {
+		fileKey = matches[3]
+	}
 	rawNodeID := u.Query().Get("node-id")
 	return URLParts{
 		FileKey: fileKey,

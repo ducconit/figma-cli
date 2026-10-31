@@ -19,20 +19,23 @@ func newTokensCmd(global *GlobalFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "tokens [figma-url-or-file-key]",
-		Short: "Extract Figma Variables (Design Tokens) to CSS Variables, Tailwind, or JSON",
+		Short: "Extract Figma Variables (Design Tokens) to CSS, Tailwind v3/v4, SwiftUI, DTCG, or JSON",
 		Long: `Extract design tokens (colors, spacing, typography sizes, border radiuses, dark/light themes)
 from Figma Variables via the Variables REST API into ready-to-use CSS Variables (:root / .dark),
-Tailwind configuration snippets (theme.extend), or structured JSON.
+Tailwind v3 configuration snippets (theme.extend), Tailwind v4 (@theme), SwiftUI DesignTokens,
+W3C Design Tokens Community Group (DTCG) format, or structured JSON.
 
 Examples:
   # Export CSS variables to stdout
   fm tokens "https://www.figma.com/design/abc123XYZ/Design-System"
 
-  # Export Tailwind config extension to a file
+  # Export Tailwind v3 or v4 configuration
   fm tokens --file-key abc123XYZ --format tailwind -o tailwind.tokens.js
+  fm tokens --file-key abc123XYZ --format tailwind-v4 -o theme.css
 
-  # Export structured token JSON
-  fm tokens abc123XYZ --format json`,
+  # Export SwiftUI or W3C DTCG tokens
+  fm tokens abc123XYZ --format swiftui -o DesignTokens.swift
+  fm tokens abc123XYZ --format dtcg -o tokens.dtcg.json`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, resolvedFileKey, _, err := initFigmaClient(global, args, fileKey, "", baseURL)
@@ -77,7 +80,7 @@ Examples:
 	}
 
 	cmd.Flags().StringVarP(&fileKey, "file-key", "k", "", "Figma file key (overrides URL fileKey)")
-	cmd.Flags().StringVarP(&format, "format", "f", "css", "Output format: css (default), tailwind, or json")
+	cmd.Flags().StringVarP(&format, "format", "f", "css", "Output format: css (default), tailwind, tailwind-v4, swiftui, dtcg, or json")
 	cmd.Flags().StringVarP(&outputPath, "output", "o", "", "Write output to file path instead of stdout")
 	cmd.Flags().StringVar(&baseURL, "api-base-url", "", "Override Figma API base URL (for testing)")
 	_ = cmd.Flags().MarkHidden("api-base-url")

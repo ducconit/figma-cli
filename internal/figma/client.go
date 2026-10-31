@@ -379,22 +379,29 @@ func (c *Client) DownloadToFile(ctx context.Context, imageURL, destPath string) 
 		return fmt.Errorf("failed to download image (status %d)", resp.StatusCode)
 	}
 
-	tmpPath := destPath + ".part"
-	f, err := os.Create(tmpPath)
+	destDir := filepath.Dir(destPath)
+	destBase := filepath.Base(destPath)
+	tmpFile, err := os.CreateTemp(destDir, destBase+".*.part")
 	if err != nil {
-		return fmt.Errorf("create file %s: %w", destPath, err)
+		return fmt.Errorf("create temp file for %s: %w", destPath, err)
 	}
+	tmpPath := tmpFile.Name()
+	success := false
+	defer func() {
+		if !success {
+			_ = os.Remove(tmpPath)
+		}
+	}()
 
-	_, copyErr := io.Copy(f, resp.Body)
-	closeErr := f.Close()
+	_, copyErr := io.Copy(tmpFile, resp.Body)
+	closeErr := tmpFile.Close()
 	if copyErr != nil || closeErr != nil {
-		_ = os.Remove(tmpPath)
 		return errors.Join(copyErr, closeErr)
 	}
 	if err := os.Rename(tmpPath, destPath); err != nil {
-		_ = os.Remove(tmpPath)
 		return fmt.Errorf("finalize file %s: %w", destPath, err)
 	}
+	success = true
 	return nil
 }
 

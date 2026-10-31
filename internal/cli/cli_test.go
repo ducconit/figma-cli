@@ -44,7 +44,20 @@ func TestVersionAndHelpCommands(t *testing.T) {
 	}
 
 	// 3. fm -h and subcommands -h
-	for _, sub := range [][]string{{"-h"}, {"fetch", "-h"}, {"download", "-h"}, {"tokens", "-h"}, {"link", "-h"}, {"install", "-h"}, {"set-token", "-h"}, {"update", "-h"}} {
+	for _, sub := range [][]string{
+		{"-h"},
+		{"fetch", "-h"},
+		{"download", "-h"},
+		{"screenshot", "-h"},
+		{"motion", "-h"},
+		{"tokens", "-h"},
+		{"code-connect", "-h"},
+		{"link", "-h"},
+		{"mcp", "-h"},
+		{"install", "-h"},
+		{"set-token", "-h"},
+		{"update", "-h"},
+	} {
 		helpOut, err := executeCLI(t, sub...)
 		if err != nil {
 			t.Fatalf("fm %v failed: %v", sub, err)
@@ -374,5 +387,162 @@ func TestLinkCLICommand(t *testing.T) {
 	}
 	if !strings.Contains(outDel, "Deleted dev resource res-1") {
 		t.Fatalf("unexpected link delete output:\n%s", outDel)
+	}
+}
+
+func TestScreenshotCLICommand(t *testing.T) {
+	var srv *httptest.Server
+	mux := http.NewServeMux()
+	mux.HandleFunc("/files/abc123XYZ", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{
+			"name": "Demo Screen",
+			"document": {
+				"id": "0:0",
+				"type": "DOCUMENT",
+				"children": [
+					{
+						"id": "1:1",
+						"name": "Page 1",
+						"type": "CANVAS",
+						"children": [
+							{"id": "10:99", "name": "LoginFrame", "type": "FRAME"}
+						]
+					}
+				]
+			}
+		}`))
+	})
+	mux.HandleFunc("/images/abc123XYZ", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		ids := r.URL.Query().Get("ids")
+		if ids == "99:99" {
+			// Simulate empty render URL failure mode (Review Focus #2)
+			_, _ = w.Write([]byte(`{"images":{"99:99":null}}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{"images":{"` + ids + `":"` + srv.URL + `/render.png"}}`))
+	})
+	mux.HandleFunc("/render.png", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "image/png")
+		_, _ = w.Write([]byte("fake-png-bytes"))
+	})
+	srv = httptest.NewServer(mux)
+	defer srv.Close()
+
+	// 1. Explicit node-id screenshot with --json
+	outPath := filepath.Join(t.TempDir(), "hero.png")
+	outJSON, err := executeCLI(t, "screenshot", "https://www.figma.com/design/abc123XYZ/App?node-id=12-34",
+		"-o", outPath, "--scale", "2", "--json", "--token", "tok123", "--api-base-url", srv.URL)
+	if err != nil {
+		t.Fatalf("fm screenshot failed: %v\nOutput: %s", err, outJSON)
+	}
+	if !strings.Contains(outJSON, `"nodeId": "12:34"`) || !strings.Contains(outJSON, `"filePath"`) {
+		t.Fatalf("unexpected screenshot JSON output:\n%s", outJSON)
+	}
+	if _, statErr := os.Stat(outPath); statErr != nil {
+		t.Fatalf("expected screenshot file at %s: %v", outPath, statErr)
+	}
+
+	// 2. Auto-discover top-level frame when node-id is omitted
+	autoDir := t.TempDir()
+	outAuto, err := executeCLI(t, "screenshot", "abc123XYZ", "-o", autoDir, "--token", "tok123", "--api-base-url", srv.URL)
+	if err != nil {
+		t.Fatalf("fm screenshot auto-discover failed: %v\nOutput: %s", err, outAuto)
+	}
+	if !strings.Contains(outAuto, "10:99") {
+		t.Fatalf("expected auto-discovered frame 10:99 in output:\n%s", outAuto)
+	}
+
+	// 3. Empty render URL failure mode
+	if _, err := executeCLI(t, "screenshot", "abc123XYZ", "--node-id", "99:99", "--token", "tok123", "--api-base-url", srv.URL); err == nil {
+		t.Fatal("expected error when Figma returns null render URL")
+	}
+}
+
+func TestMotionCodeConnectAndMCPCLICommands(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/files/abc123XYZ/nodes", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{
+			"name": "Motion & Code Connect App",
+			"nodes": {
+				"12:34": {
+					"document": {
+						"id": "12:34",
+						"name": "PrimaryButton",
+						"type": "COMPONENT_SET",
+						"transitionNodeID": "12:35",
+						"transitionDuration": 0.25,
+						"transitionEasing": "EASE_IN_AND_OUT",
+						"children": []
+					},
+					"componentSets": {
+						"12:34": {
+							"id": "12:34",
+							"key": "cs_btn",
+							"name": "Buttons/PrimaryButton",
+							"propertyDefinitions": {
+								"Label": {"type": "TEXT", "defaultValue": "Submit"}
+							}
+						}
+					}
+				}
+			}
+		}`))
+	})
+	mux.HandleFunc("/files/abc123XYZ/dev_resources", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"links":[{"id":"r1","name":"Code Connect: PrimaryButton","url":"https://github.com/org/repo/blob/main/PrimaryButton.tsx","file_key":"abc123XYZ","node_id":"12:34"}]}`))
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	// 1. fm motion
+	outMotion, err := executeCLI(t, "motion", "https://www.figma.com/design/abc123XYZ/App?node-id=12-34",
+		"--format", "framer", "--token", "tok123", "--api-base-url", srv.URL)
+	if err != nil {
+		t.Fatalf("fm motion failed: %v\nOutput: %s", err, outMotion)
+	}
+	if !strings.Contains(outMotion, "motionTransitions") || !strings.Contains(outMotion, "0.25") {
+		t.Fatalf("unexpected fm motion output:\n%s", outMotion)
+	}
+
+	// 2. fm code-connect generate & link
+	srcDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(srcDir, "PrimaryButton.tsx"), []byte(`export function PrimaryButton() { return <button/>; }`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	outCC, err := executeCLI(t, "code-connect", "generate", "https://www.figma.com/design/abc123XYZ/App?node-id=12-34",
+		"--dir", srcDir, "--token", "tok123", "--api-base-url", srv.URL)
+	if err != nil {
+		t.Fatalf("fm code-connect generate failed: %v\nOutput: %s", err, outCC)
+	}
+	if !strings.Contains(outCC, "PrimaryButton.figma.ts") {
+		t.Fatalf("expected PrimaryButton.figma.ts in output:\n%s", outCC)
+	}
+
+	outCCLink, err := executeCLI(t, "code-connect", "link", "https://www.figma.com/design/abc123XYZ/App?node-id=12-34",
+		"--dir", srcDir, "--token", "tok123", "--api-base-url", srv.URL)
+	if err != nil {
+		t.Fatalf("fm code-connect link failed: %v\nOutput: %s", err, outCCLink)
+	}
+	if !strings.Contains(outCCLink, "Linked 1 Dev Resource") {
+		t.Fatalf("expected Linked 1 Dev Resource in output:\n%s", outCCLink)
+	}
+
+	// 3. fm mcp over stdin/stdout
+	cmd := NewRootCmd()
+	inBuf := bytes.NewBufferString(`{"jsonrpc":"2.0","id":1,"method":"initialize"}` + "\n")
+	var outBuf bytes.Buffer
+	cmd.SetIn(inBuf)
+	cmd.SetOut(&outBuf)
+	cmd.SetErr(&outBuf)
+	cmd.SetArgs([]string{"mcp", "--token", "tok123", "--api-base-url", srv.URL})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("fm mcp failed: %v", err)
+	}
+	if !strings.Contains(outBuf.String(), `"protocolVersion":"2024-11-05"`) {
+		t.Fatalf("unexpected fm mcp initialize output:\n%s", outBuf.String())
 	}
 }
