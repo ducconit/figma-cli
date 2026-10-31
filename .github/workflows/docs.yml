@@ -1,0 +1,58 @@
+name: Deploy GitHub Pages Documentation
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - "v*"
+    branches:
+      - main
+    paths:
+      - "README.md"
+      - "GUIDE.md"
+      - "docs/**"
+      - "site/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy-docs:
+    name: Build & Deploy Documentation to gh-pages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare Documentation Site
+        run: |
+          mkdir -p site/docs
+          cp README.md site/README.md
+          cp GUIDE.md site/guide.md
+          cp docs/*.md site/docs/
+          touch site/.nojekyll
+
+          # Resolve latest release or tag version
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
+          echo "Resolved latest version: ${LATEST_TAG}"
+
+          # Update version badges or links if necessary
+          sed -i "s/v0\.0\.1/${LATEST_TAG}/g" site/README.md site/guide.md site/_coverpage.md 2>/dev/null || true
+
+      - name: Deploy to gh-pages Branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
+          commit_message: "docs: update documentation for ${{ github.ref_name || github.sha }}"
