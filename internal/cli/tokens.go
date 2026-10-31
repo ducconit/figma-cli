@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ducconit/figma-cli/internal/stitch"
 	"github.com/ducconit/figma-cli/internal/tokens"
 	"github.com/spf13/cobra"
 )
@@ -41,6 +42,34 @@ Examples:
 			client, resolvedFileKey, _, err := initFigmaClient(global, args, fileKey, "", baseURL)
 			if err != nil {
 				return err
+			}
+
+			if format == "stitch" || format == "design-md" {
+				spec, err := stitch.ExtractDesignSystem(cmd.Context(), client, resolvedFileKey, "", stitch.ExtractionOptions{})
+				if err != nil {
+					return fmt.Errorf("extract stitch design system: %w", err)
+				}
+				exported, err := stitch.SerializeStitch(spec)
+				if err != nil {
+					return fmt.Errorf("serialize stitch design system: %w", err)
+				}
+				if outputPath != "" {
+					cleanOut := filepath.Clean(outputPath)
+					absOut, err := filepath.Abs(cleanOut)
+					if err != nil {
+						return err
+					}
+					if err := os.MkdirAll(filepath.Dir(absOut), 0o755); err != nil {
+						return fmt.Errorf("create output directory: %w", err)
+					}
+					if err := os.WriteFile(absOut, []byte(exported), 0o644); err != nil {
+						return fmt.Errorf("write output file %s: %w", absOut, err)
+					}
+					fmt.Fprintf(cmd.OutOrStdout(), "Saved Google Stitch DESIGN.md to `%s`\n", absOut)
+					return nil
+				}
+				fmt.Fprint(cmd.OutOrStdout(), exported)
+				return nil
 			}
 
 			fmtType, err := tokens.ParseFormat(format)
@@ -80,7 +109,7 @@ Examples:
 	}
 
 	cmd.Flags().StringVarP(&fileKey, "file-key", "k", "", "Figma file key (overrides URL fileKey)")
-	cmd.Flags().StringVarP(&format, "format", "f", "css", "Output format: css (default), tailwind, tailwind-v4, swiftui, dtcg, or json")
+	cmd.Flags().StringVarP(&format, "format", "f", "css", "Output format: css (default), tailwind, tailwind-v4, swiftui, dtcg, stitch, or json")
 	cmd.Flags().StringVarP(&outputPath, "output", "o", "", "Write output to file path instead of stdout")
 	cmd.Flags().StringVar(&baseURL, "api-base-url", "", "Override Figma API base URL (for testing)")
 	_ = cmd.Flags().MarkHidden("api-base-url")

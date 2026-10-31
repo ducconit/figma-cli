@@ -207,7 +207,8 @@ Mở bất kỳ AI Agent nào (Google Antigravity, Claude Code, OpenAI Codex, Cu
 | **`fm fetch`** | `fm fetch <url-figma> -o /tmp/screen.tree` | Trích xuất cây layout, styles, typography sang Tree DSL (tiết kiệm 40%–55% token, hỗ trợ cả `/branch/` URL). |
 | **`fm screenshot`** | `fm screenshot <url-figma> -o ./tmp/screen.png` | Render ảnh chụp node/frame chất lượng cao (`png`, `jpg`, `svg`) để đối chiếu giao diện trực quan. |
 | **`fm motion`** | `fm motion <url-figma> --format framer` *(hoặc `css`, `json`)* | Bóc tách Prototype transitions, durations & cubic-bezier easing sang CSS `@keyframes` hoặc Framer Motion. |
-| **`fm tokens`** | `fm tokens <url-figma> --format tailwind-v4` *(hoặc `css`, `tailwind`, `swiftui`, `dtcg`, `json`)* | Trích xuất Figma Variables thành CSS Variables, Tailwind v3/v4, SwiftUI `DesignTokens`, W3C DTCG hoặc JSON. |
+| **`fm tokens`** | `fm tokens <url-figma> --format tailwind-v4` *(hoặc `css`, `tailwind`, `swiftui`, `dtcg`, `stitch`, `json`)* | Trích xuất Figma Variables thành CSS Variables, Tailwind v3/v4, SwiftUI `DesignTokens`, W3C DTCG hoặc JSON. |
+| **`fm stitch`** | `fm stitch <url-figma> -o DESIGN.md` *(hoặc `fm design-system`)* | Xuất đặc tả Google Stitch `DESIGN.md` chuẩn 100% từ Figma Variables và Canvas nodes (colors, typography, spacing, radius, components). |
 | **`fm code-connect`** | `fm code-connect generate <url-figma> --dir ./src` | Quét component trong repo (`.tsx`, `.vue`, `.swift`), khớp với Figma Component và sinh file `.figma.ts`. |
 | **`fm download`** | `fm download <url-figma> --dir ./public/images` | Tải toàn bộ hình ảnh, GIF và icon vector SVG tự động (mặc định lưu `/tmp`). |
 | **`fm link`** | `fm link <url-figma> --url <pr-link> --name "PR #42"` | Gắn, liệt kê (`--list`) hoặc xóa (`--delete`) dev resource links (PR, Storybook, Jira) trên Figma node. |

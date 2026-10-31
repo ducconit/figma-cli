@@ -128,6 +128,25 @@ Extract Figma Variables (colors, spacing, radii, typography, dark/light modes) i
 .agents/skills/figma-cli/scripts/fm tokens <fileKey> --format dtcg -o ./tokens.json
 ```
 
+### Export Design System to Google Stitch DESIGN.md (`fm stitch`)
+
+Extract and generate a 100% compliant [Google Stitch DESIGN.md](https://stitch.withgoogle.com/docs/design-md/specification/) specification from any Figma URL, File Key, or Design System Canvas Page:
+
+```bash
+# Export DESIGN.md from a Figma Design System canvas page or URL
+.agents/skills/figma-cli/scripts/fm stitch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=1:133" -o DESIGN.md
+
+# Force Canvas heuristic extraction for Community UI Kits / Files without Variables
+.agents/skills/figma-cli/scripts/fm stitch <fileKey> --force-canvas -o DESIGN.md
+
+# Validate with official Google Stitch linter
+npx -y @google/design.md lint DESIGN.md
+
+# Export generated tokens directly to Tailwind v4 @theme, DTCG, or CSS Variables
+npx -y @google/design.md export DESIGN.md --format css-tailwind
+npx -y @google/design.md export DESIGN.md --format dtcg
+```
+
 ### Visual Screenshots (`fm screenshot`)
 
 Render and download pixel-accurate PNG, JPG, or SVG visual snapshots of Figma frames or components for automated visual verification:

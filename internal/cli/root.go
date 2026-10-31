@@ -112,6 +112,7 @@ Authentication is resolved in order:
 		newScreenshotCmd(&flags),
 		newMotionCmd(&flags),
 		newTokensCmd(&flags),
+		newStitchCmd(&flags),
 		newCodeConnectCmd(&flags),
 		newLinkCmd(&flags),
 		newMCPCmd(&flags),

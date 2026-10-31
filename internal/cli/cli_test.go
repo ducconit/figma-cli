@@ -57,6 +57,7 @@ func TestVersionAndHelpCommands(t *testing.T) {
 		{"install", "-h"},
 		{"set-token", "-h"},
 		{"update", "-h"},
+		{"stitch", "-h"},
 	} {
 		helpOut, err := executeCLI(t, sub...)
 		if err != nil {
@@ -544,5 +545,116 @@ func TestMotionCodeConnectAndMCPCLICommands(t *testing.T) {
 	}
 	if !strings.Contains(outBuf.String(), `"protocolVersion":"2024-11-05"`) {
 		t.Fatalf("unexpected fm mcp initialize output:\n%s", outBuf.String())
+	}
+}
+
+func TestStitchCLICommand(t *testing.T) {
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if strings.HasSuffix(r.URL.Path, "/variables/local") {
+			_, _ = w.Write([]byte(`{
+				"status": 200,
+				"error": false,
+				"meta": {
+					"variables": {
+						"v-brand": {
+							"id": "v-brand",
+							"name": "Colors/BrandPrimary",
+							"variableCollectionID": "col-1",
+							"resolvedType": "COLOR",
+							"valuesByMode": {
+								"m-1": {"r": 0.2, "g": 0.4, "b": 0.9, "a": 1.0}
+							}
+						}
+					},
+					"variableCollections": {
+						"col-1": {
+							"id": "col-1",
+							"name": "Tokens",
+							"defaultModeId": "m-1",
+							"modes": [{"modeId": "m-1", "name": "Light"}]
+						}
+					}
+				}
+			}`))
+			return
+		}
+
+		if strings.Contains(r.URL.Path, "/nodes") {
+			_, _ = w.Write([]byte(`{
+				"name": "DreamsPOS UI Kit",
+				"nodes": {
+					"1:133": {
+						"document": {
+							"id": "1:133",
+							"name": "Design System",
+							"type": "FRAME",
+							"children": [
+								{
+									"id": "c-1",
+									"name": "Primary / 500",
+									"type": "FRAME",
+									"fills": [{"type": "SOLID", "color": {"r": 0.99, "g": 0.62, "b": 0.26, "a": 1.0}}]
+								}
+							]
+						}
+					}
+				}
+			}`))
+			return
+		}
+
+		if strings.HasPrefix(r.URL.Path, "/v1/files/") {
+			_, _ = w.Write([]byte(`{
+				"name": "DreamsPOS UI Kit",
+				"document": {
+					"id": "0:0",
+					"name": "Document",
+					"type": "DOCUMENT",
+					"children": []
+				}
+			}`))
+			return
+		}
+
+		http.NotFound(w, r)
+	}))
+	defer mockServer.Close()
+
+	// 1. fm stitch with URL and node-id
+	tmpDir := t.TempDir()
+	outFile := filepath.Join(tmpDir, "DESIGN.md")
+
+	out, err := executeCLI(t, "stitch", "https://www.figma.com/design/abc123XYZ/DreamsPOS?node-id=1:133",
+		"-o", outFile, "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm stitch failed: %v\nOutput: %s", err, out)
+	}
+
+	if !strings.Contains(out, "Successfully generated Google Stitch DESIGN.md") {
+		t.Fatalf("unexpected summary in output:\n%s", out)
+	}
+
+	content, err := os.ReadFile(outFile)
+	if err != nil {
+		t.Fatalf("read generated DESIGN.md: %v", err)
+	}
+
+	strContent := string(content)
+	if !strings.HasPrefix(strContent, "---\nversion: alpha\n") {
+		t.Fatalf("expected DESIGN.md frontmatter, got:\n%s", strContent[:100])
+	}
+	if !strings.Contains(strContent, "# DreamsPOS UI Kit Design System Specification") {
+		t.Fatalf("expected specification title in body, got:\n%s", strContent)
+	}
+
+	// 2. fm tokens -f stitch
+	outTokensStitch, err := executeCLI(t, "tokens", "https://www.figma.com/design/abc123XYZ/DreamsPOS",
+		"-f", "stitch", "--token", "tok123", "--api-base-url", mockServer.URL)
+	if err != nil {
+		t.Fatalf("fm tokens -f stitch failed: %v\nOutput: %s", err, outTokensStitch)
+	}
+	if !strings.Contains(outTokensStitch, "version: alpha") {
+		t.Fatalf("expected version: alpha in fm tokens -f stitch, got:\n%s", outTokensStitch[:200])
 	}
 }

@@ -18,6 +18,7 @@ Tài liệu hướng dẫn toàn diện từ A-Z về cài đặt, cấu hình, 
    - [`fm set-token` — Lưu Access Token an toàn](#fm-set-token--lưu-access-token-an-toàn)
    - [`fm fetch` — Trích xuất & Tối ưu Cây Thiết kế](#fm-fetch--trích-xuất--tối-ưu-cây-thiết-kế)
    - [`fm tokens` — Trích xuất Design Tokens (CSS / Tailwind / JSON)](#fm-tokens--trích-xuất-design-tokens-css--tailwind--json)
+   - [`fm stitch` — Xuất đặc tả Google Stitch DESIGN.md](#fm-stitch--xuất-đặc-tả-google-stitch-designmd)
    - [`fm download` — Tải & Cắt Tài nguyên Đa luồng](#fm-download--tải--cắt-tài-nguyên-đa-luồng)
    - [`fm link` — Quản lý Dev Resources & Code Links](#fm-link--quản-lý-dev-resources--code-links)
    - [`fm update` — Tự động Cập nhật Phiên bản Mới](#fm-update--tự-động-cập-nhật-phiên-bản-mới)
@@ -173,6 +174,7 @@ flowchart TD
 | **`fm set-token`** | `fm set-token <token> [--oauth]` | Lưu hoặc cập nhật Access Token vào duy nhất file `~/.figma/.env`. |
 | **`fm fetch`** | `fm fetch <url-or-key> [flags]` | Tải và tinh gọn cây thiết kế thành Tree DSL (tiết kiệm 40%–55% token), YAML hoặc JSON. |
 | **`fm tokens`** | `fm tokens <url-or-key> [flags]` | Trích xuất Figma Variables thành CSS Variables (`:root`/`.dark`), Tailwind Config JS hoặc JSON. |
+| **`fm stitch`** | `fm stitch <url-or-key> [flags]` | Xuất đặc tả Google Stitch `DESIGN.md` chuẩn 100% từ Figma Variables và Canvas frames. |
 | **`fm download`** | `fm download <url-or-key> [flags]` | Tải hình ảnh, GIF và SVG đa luồng. Mặc định lưu vào `/tmp`, hỗ trợ cắt ảnh affine crop. |
 | **`fm link`** | `fm link <url-or-key> [flags]` | Gắn, xem danh sách hoặc xóa dev resource links (GitHub PR, Storybook, Jira) trên Figma nodes. |
 | **`fm update`** | `fm update [flags]` | Tự động kiểm tra và nâng cấp binary lên phiên bản phát hành mới nhất từ GitHub Releases. |
@@ -291,6 +293,36 @@ fm tokens abc123XYZ --format json -o ./tokens.json
 - **Tự động giải quyết Alias (`VARIABLE_ALIAS`)**: Khi biến A tham chiếu biến B, `fm` tự động truy vết giá trị gốc và giải quyết theo đúng mode tương ứng.
 - **Phát hiện & Chặn lặp vô tận (Cycle Detection)**: Tự động phát hiện các vòng lặp tham chiếu chéo (`A -> B -> A`) với ngưỡng độ sâu đệ quy tối đa 20 bước, không bao giờ gây tràn ngăn xếp (stack overflow).
 - **Chuẩn hóa Bộ chọn CSS**: Tự động chuyển đổi tên biến Figma có dấu gạch chéo (`Colors/Primary/500`) thành CSS variable hợp lệ (`--colors-primary-500`). Mode "Dark" được tự động gán vào class `.dark`, các mode khác được phân loại vào `[data-theme="..."]`.
+
+---
+
+### `fm stitch` — Xuất đặc tả Google Stitch DESIGN.md
+
+Tự động trích xuất và sinh tài liệu đặc tả chuẩn mở **[Google Stitch DESIGN.md](https://stitch.withgoogle.com/docs/design-md/specification/)** (kèm YAML frontmatter và các bảng Markdown chi tiết về Colors, Typography, Spacing, Border Radius và Components).
+
+Công cụ sử dụng kiến trúc **Dual-Source Extractor**:
+- **Nguồn 1: Figma Variables API**: Đọc biến màu sắc, khoảng cách, bo góc nếu file Figma có sử dụng.
+- **Nguồn 2: Canvas Heuristic Extractor**: Quét thông minh các frame swatch màu, typography mẫu và component variants (Button, Input, Badge, Card) đối với các file UI Kit miễn phí/Community vẽ trực tiếp trên canvas.
+- **Token Reference Validator**: Tự động kiểm tra và chuẩn hóa mọi tham chiếu `{colors.*}`, `{rounded.*}`, `{typography.*}` đảm bảo kiểm tra với `@google/design.md lint` đạt 0 lỗi ngay lập tức.
+
+```bash
+# 1. Xuất file DESIGN.md từ một trang hoặc frame Design System trên Figma
+fm stitch "https://www.figma.com/design/abc123XYZ/DreamsPOS?node-id=1:133" -o DESIGN.md
+
+# 2. Bắt buộc quét cây node Canvas (bỏ qua Variables API)
+fm stitch abc123XYZ --force-canvas -o DESIGN.md
+
+# 3. Bật chế độ validate để xem log chuẩn hóa token
+fm stitch abc123XYZ --validate -o DESIGN.md
+
+# 4. Xuất dạng JSON cấu trúc
+fm stitch abc123XYZ --json -o design-system.json
+
+# 5. Kiểm tra và chuyển đổi bằng công cụ chính thức của Google Labs
+npx -y @google/design.md lint DESIGN.md
+npx -y @google/design.md export DESIGN.md --format css-tailwind
+npx -y @google/design.md export DESIGN.md --format dtcg
+```
 
 ---
 

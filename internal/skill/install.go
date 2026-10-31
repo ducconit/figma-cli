@@ -516,7 +516,7 @@ func renderSkillMarkdown(skillName, binPath string, multiOS bool) string {
 }
 
 func renderSkillMarkdownSingleOS(skillName, binPath string) string {
-	return fmt.Sprintf(`---
+	header := fmt.Sprintf(`---
 name: %s
 description: >-
   Fetch simplified Figma design data (layout, Flexbox/CSS Grid, typography, rich text, colors, gradients, components)
@@ -593,35 +593,9 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
    - Linear, radial, angular (`+"`conic-gradient`"+`), and diamond gradients are pre-converted to valid CSS syntax.
 3. **TILE Mode Images**:
    - When `+"`scaleMode: TILE`"+` is present, copy the `+"`--original-width: ...; --original-height: ...;`"+` variables printed by `+"`fm download`"+` onto the element's inline style.
+`, skillName, binPath, binPath, binPath, binPath, binPath, binPath, binPath)
 
----
-
-## Additional Capabilities
-
-### Extract Design Tokens (`+"`fm tokens`"+`)
-
-Extract Figma Variables (colors, spacing, radii, dark/light modes) into CSS Variables, Tailwind, or JSON:
-
-`+"```bash"+`
-# Export CSS variables (:root / .dark)
-%s tokens "https://www.figma.com/design/<fileKey>/<fileName>" --format css -o ./src/styles/tokens.css
-
-# Export Tailwind config extension
-%s tokens <fileKey> --format tailwind -o ./tailwind.tokens.js
-`+"```"+`
-
-### Manage Dev Mode Resources (`+"`fm link`"+`)
-
-Attach or view code implementation links (GitHub PR, Storybook, Jira) directly on Figma nodes:
-
-`+"```bash"+`
-# Attach a link to a node
-%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --url "https://github.com/org/repo/pull/42" --name "PR #42"
-
-# List links on a node or file
-%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --list
-`+"```"+`
-`, skillName, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath, binPath)
+	return header + "\n---\n\n" + renderAdditionalCapabilities(binPath)
 }
 
 func renderSkillMarkdownMultiOS(skillName, binPath string) string {
@@ -630,7 +604,7 @@ func renderSkillMarkdownMultiOS(skillName, binPath string) string {
 	winBin := scriptsDir + "/fm.exe"
 	linuxBin := scriptsDir + "/fm"
 
-	return fmt.Sprintf(`---
+	header := fmt.Sprintf(`---
 name: %s
 description: >-
   Fetch simplified Figma design data (layout, Flexbox/CSS Grid, typography, rich text, colors, gradients, components)
@@ -734,34 +708,6 @@ By default, `+"`fm download`"+` saves files to the OS temporary directory (`+"`o
    - Linear, radial, angular (`+"`conic-gradient`"+`), and diamond gradients are pre-converted to valid CSS syntax.
 3. **TILE Mode Images**:
    - When `+"`scaleMode: TILE`"+` is present, copy the `+"`--original-width: ...; --original-height: ...;`"+` variables printed by `+"`fm download`"+` onto the element's inline style.
-
----
-
-## Additional Capabilities
-
-### Extract Design Tokens (`+"`fm tokens`"+`)
-
-Extract Figma Variables (colors, spacing, radii, dark/light modes) into CSS Variables, Tailwind, or JSON:
-
-`+"```bash"+`
-# Export CSS variables (:root / .dark)
-%s tokens "https://www.figma.com/design/<fileKey>/<fileName>" --format css -o ./src/styles/tokens.css
-
-# Export Tailwind config extension
-%s tokens <fileKey> --format tailwind -o ./tailwind.tokens.js
-`+"```"+`
-
-### Manage Dev Mode Resources (`+"`fm link`"+`)
-
-Attach or view code implementation links (GitHub PR, Storybook, Jira) directly on Figma nodes:
-
-`+"```bash"+`
-# Attach a link to a node
-%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --url "https://github.com/org/repo/pull/42" --name "PR #42"
-
-# List links on a node or file
-%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --list
-`+"```"+`
 `,
 		skillName,
 		binPath,
@@ -782,10 +728,134 @@ Attach or view code implementation links (GitHub PR, Storybook, Jira) directly o
 		binPath,
 		binPath,
 		binPath,
-		binPath,
-		binPath,
-		binPath,
-		binPath,
+	)
+
+	return header + "\n---\n\n" + renderAdditionalCapabilities(binPath)
+}
+
+func renderAdditionalCapabilities(binPath string) string {
+	return fmt.Sprintf(`## Additional Capabilities
+
+### Extract Design Tokens (`+"`fm tokens`"+`)
+
+Extract Figma Variables (colors, spacing, radii, typography, dark/light modes) into CSS Variables, Tailwind v3/v4 (`+"`@theme`"+`), SwiftUI (`+"`DesignTokens`"+`), DTCG (W3C standard), or JSON:
+
+`+"```bash"+`
+# Export CSS variables (:root / .dark)
+%s tokens "https://www.figma.com/design/<fileKey>/<fileName>" --format css -o ./src/styles/tokens.css
+
+# Export Tailwind v4 @theme CSS
+%s tokens <fileKey> --format tailwind-v4 -o ./src/styles/theme.css
+
+# Export Tailwind v3 config extension
+%s tokens <fileKey> --format tailwind -o ./tailwind.tokens.js
+
+# Export native SwiftUI enum
+%s tokens <fileKey> --format swiftui -o ./DesignTokens.swift
+
+# Export W3C Design Token Community Group (DTCG) JSON
+%s tokens <fileKey> --format dtcg -o ./tokens.json
+`+"```"+`
+
+### Export Design System to Google Stitch DESIGN.md (`+"`fm stitch`"+`)
+
+Extract and generate a 100%% compliant [Google Stitch DESIGN.md](https://stitch.withgoogle.com/docs/design-md/specification/) specification from any Figma URL, File Key, or Design System Canvas Page:
+
+`+"```bash"+`
+# Export DESIGN.md from a Figma Design System canvas page or URL
+%s stitch "https://www.figma.com/design/<fileKey>/<fileName>?node-id=1:133" -o DESIGN.md
+
+# Force Canvas heuristic extraction for Community UI Kits / Files without Variables
+%s stitch <fileKey> --force-canvas -o DESIGN.md
+
+# Validate with official Google Stitch linter
+npx -y @google/design.md lint DESIGN.md
+
+# Export generated tokens directly to Tailwind v4 @theme, DTCG, or CSS Variables
+npx -y @google/design.md export DESIGN.md --format css-tailwind
+npx -y @google/design.md export DESIGN.md --format dtcg
+`+"```"+`
+
+### Visual Screenshots (`+"`fm screenshot`"+`)
+
+Render and download pixel-accurate PNG, JPG, or SVG visual snapshots of Figma frames or components for automated visual verification:
+
+`+"```bash"+`
+# Render a 2x PNG screenshot of a frame
+%s screenshot "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --scale 2 -o ./tmp/screenshot.png
+
+# Output screenshot URL and file metadata as JSON
+%s screenshot <fileKey> --node-id 12:34 --json
+`+"```"+`
+
+### Motion & Prototype Animations (`+"`fm motion`"+`)
+
+Extract prototype interactions, smart animate transitions, durations, and cubic-bezier easing curves into CSS `+"`@keyframes`"+`, Framer Motion / `+"`motion.dev`"+`, or JSON:
+
+`+"```bash"+`
+# Export CSS @keyframes and transition utility classes
+%s motion "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --format css -o ./src/styles/motion.css
+
+# Export Framer Motion / motion.dev transition configs
+%s motion <fileKey> --node-id 12:34 --format framer -o ./src/motion.ts
+`+"```"+`
+
+### Code Connect (`+"`fm code-connect`"+`)
+
+Scan local frontend components (`+"`.tsx`"+`, `+"`.jsx`"+`, `+"`.vue`"+`, `+"`.swift`"+`), fuzzy-match them against Figma components/component sets, generate parserless `+"`.figma.ts`"+` templates, and attach Dev Resources:
+
+`+"```bash"+`
+# Scan local directory and report match percentages against Figma
+%s code-connect scan "https://www.figma.com/design/<fileKey>/<fileName>" --dir ./src
+
+# Generate .figma.ts Code Connect templates for matched components
+%s code-connect generate <fileKey> --dir ./src --out-dir ./figma
+
+# Attach repository source URLs to Figma component nodes via Dev Resources API
+%s code-connect link <fileKey> --dir ./src --repo-url "https://github.com/my-org/my-repo/blob/main"
+`+"```"+`
+
+### Model Context Protocol (MCP) Server (`+"`fm mcp`"+`)
+
+Start a zero-dependency JSON-RPC 2.0 MCP server over stdio for AI Coding Agents (Antigravity, Cursor, Claude Code, Windsurf):
+
+`+"```json"+`
+{
+  "mcpServers": {
+    "figma-cli": {
+      "command": "/path/to/fm",
+      "args": ["mcp"]
+    }
+  }
+}
+`+"```"+`
+
+Exposed MCP tools:
+- `+"`get_design_context`"+`: Fetch and simplify Figma Design trees into token-efficient Tree DSL, YAML, or JSON.
+- `+"`get_screenshot`"+`: Render high-DPI screenshots of frames/nodes for visual verification.
+- `+"`get_tokens`"+`: Extract Figma Variables into CSS, Tailwind v3/v4, SwiftUI, DTCG, or JSON.
+- `+"`get_motion_context`"+`: Extract prototype animations, transitions, and easing curves.
+- `+"`download_assets`"+`: Auto-discover, download, and crop SVG/PNG/GIF assets.
+- `+"`code_connect`"+`: Match codebase components with Figma components and generate `+"`.figma.ts`"+`.
+
+### Manage Dev Mode Resources (`+"`fm link`"+`)
+
+Attach or view code implementation links (GitHub PR, Storybook, Jira) directly on Figma nodes:
+
+`+"```bash"+`
+# Attach a link to a node
+%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --url "https://github.com/org/repo/pull/42" --name "PR #42"
+
+# List links on a node or file
+%s link "https://www.figma.com/design/<fileKey>/<fileName>?node-id=12-34" --list
+`+"```"+`
+`,
+		binPath, binPath, binPath, binPath, binPath,
+		binPath, binPath,
+		binPath, binPath,
+		binPath, binPath,
+		binPath, binPath, binPath,
+		binPath, binPath,
 	)
 }
 
