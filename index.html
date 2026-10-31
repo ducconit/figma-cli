@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>figma-cli (fm) — High-Performance Figma Extraction CLI & AI Agent Skill</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Zero-dependency, cross-platform CLI and universal AI Agent Skill to fetch and simplify Figma designs, extract Google Stitch DESIGN.md, tokens, and stream assets.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  
+  <!-- Open Graph / Meta -->
+  <meta property="og:title" content="figma-cli (fm) — Documentation & User Guide">
+  <meta property="og:description" content="High-performance, zero-dependency Figma design tree extraction, token mapping, and Google Stitch export for developers and AI coding agents.">
+  <meta property="og:type" content="website">
+
+  <!-- Themes -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/style.min.css">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --theme-color: #4F46E5;
+      --docsify-darklight-theme-dark-bg: #0F172A;
+      --docsify-darklight-theme-light-bg: #FFFFFF;
+      --base-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --code-font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+    }
+
+    body {
+      font-family: var(--base-font-family);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, pre {
+      font-family: var(--code-font-family) !important;
+      font-size: 0.9em;
+    }
+
+    .markdown-section pre {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .sidebar {
+      border-right: 1px solid rgba(0, 0, 0, 0.07);
+    }
+
+    .sidebar-nav > ul > li > a {
+      font-weight: 600;
+    }
+
+    .cover-main h1 span {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cover-main p {
+      line-height: 1.6;
+    }
+
+    .cover-main .anchor span {
+      color: inherit;
+    }
+
+    /* Modern badge styling */
+    .badge {
+      display: inline-block;
+      padding: 0.25em 0.6em;
+      font-size: 75%;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: 0.375rem;
+      background-color: #EEF2FF;
+      color: #4F46E5;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">Loading figma-cli documentation...</div>
+  <script>
+    window.$docsify = {
+      name: 'figma-cli (fm)',
+      repo: 'https://github.com/ducconit/figma-cli',
+      loadSidebar: true,
+      loadNavbar: true,
+      coverpage: true,
+      onlyCover: false,
+      auto2top: true,
+      subMaxLevel: 3,
+      maxLevel: 4,
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: 'Search documentation...',
+        noData: 'No matching results found',
+        depth: 4,
+        hideOtherSidebarContent: false
+      },
+      copyCode: {
+        buttonText: 'Copy',
+        errorText: 'Error',
+        successText: 'Copied'
+      },
+      pagination: {
+        previousText: 'Previous',
+        nextText: 'Next',
+        crossChapter: true,
+        crossChapterText: true
+      },
+      darklightTheme: {
+        siteFont: "Inter, sans-serif",
+        defaultTheme: 'light',
+        codeFontFamily: 'JetBrains Mono, monospace',
+        bodyFontSize: '16px',
+        dark: {
+          accent: '#818CF8',
+          toogleBackground: '#ffffff',
+          background: '#0F172A',
+          textColor: '#E2E8F0',
+          codeTextColor: '#F1F5F9',
+          codeBackgroundColor: '#1E293B',
+          borderColor: '#334155',
+          blockQuoteColor: '#818CF8',
+          highlightColor: '#818CF8',
+          sidebarSub Russo: '#94A3B8'
+        },
+        light: {
+          accent: '#4F46E5',
+          toogleBackground: '#0F172A',
+          background: '#ffffff',
+          textColor: '#1E293B',
+          codeTextColor: '#0F172A',
+          codeBackgroundColor: '#F8FAFC',
+          borderColor: '#E2E8F0',
+          blockQuoteColor: '#4F46E5',
+          highlightColor: '#4F46E5'
+        }
+      }
+    }
+  </script>
+  <!-- Docsify Core -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  
+  <!-- Search -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  
+  <!-- Copy Code Plugin -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  
+  <!-- Pagination Plugin -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  
+  <!-- Zoom Image Plugin -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+  
+  <!-- Dark/Light Theme -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/index.min.js"></script>
+  
+  <!-- Prism Syntax Highlighting -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-go.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-css.min.js"></script>
+</body>
+</html>
