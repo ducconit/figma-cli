@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (e.g. v0.0.1)"
+        description: "Release version (e.g. v0.1.0)"
         required: false
-        default: "v0.0.1"
+        default: "v0.1.0"
 
 permissions:
   contents: write
@@ -48,7 +48,7 @@ jobs:
           elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             RAW_VER="${GITHUB_REF#refs/tags/}"
           else
-            RAW_VER="0.0.1"
+            RAW_VER="0.1.0"
           fi
           VERSION="${RAW_VER#v}"
           COMMIT="$(git rev-parse --short HEAD)"

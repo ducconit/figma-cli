@@ -6,7 +6,7 @@ import (
 )
 
 // Version is the semantic version of the fm CLI.
-var Version = "0.0.1"
+var Version = "0.1.0"
 
 // Commit is the git commit hash, optionally injected via -ldflags.
 var Commit = "dev"

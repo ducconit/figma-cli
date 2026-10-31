@@ -1,7 +1,7 @@
 .PHONY: all build test vet install-skill cross-build clean
 
 BINARY_NAME := fm
-VERSION ?= 0.0.1
+VERSION ?= 0.1.0
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "dev")
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 LDFLAGS := -s -w -buildid= -X github.com/ducconit/figma-cli/internal/version.Version=$(VERSION) -X github.com/ducconit/figma-cli/internal/version.Commit=$(COMMIT) -X github.com/ducconit/figma-cli/internal/version.BuildDate=$(BUILD_DATE)
